@@ -1,0 +1,9 @@
+fn unused.used() -> i64 {
+b0:
+    ret i64 2
+}
+fn unused.main() -> i64 {
+b0:
+    %0 = call i64 @unused.used()
+    ret i64 %0
+}

@@ -1,0 +1,48 @@
+spill7.seven:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $64, %rsp
+    movq %rbx, 56(%rsp)
+    movq %r12, 48(%rsp)
+    movq %r13, 40(%rsp)
+    movq %r14, 32(%rsp)
+    movq %r15, 24(%rsp)
+    movq %rdi, %rbx
+    addq $1, %rbx
+    movq %rdi, %r12
+    addq $2, %r12
+    movq %rdi, %r13
+    addq $3, %r13
+    movq %rdi, %r14
+    addq $4, %r14
+    movq %rdi, %r15
+    addq $5, %r15
+    movq %rdi, %r10
+    movq %r10, (%rsp)
+    movq (%rsp), %r10
+    addq $6, %r10
+    movq %r10, (%rsp)
+    movq %rdi, %r10
+    movq %r10, 8(%rsp)
+    movq 8(%rsp), %r10
+    addq $7, %r10
+    movq %r10, 8(%rsp)
+    call tick
+    addq %r12, %rbx
+    addq %r13, %rbx
+    addq %r14, %rbx
+    addq %r15, %rbx
+    movq (%rsp), %r10
+    addq %r10, %rbx
+    movq %rbx, %rax
+    movq 8(%rsp), %r10
+    addq %r10, %rax
+    movq 56(%rsp), %rbx
+    movq 48(%rsp), %r12
+    movq 40(%rsp), %r13
+    movq 32(%rsp), %r14
+    movq 24(%rsp), %r15
+    movq %rbp, %rsp
+    popq %rbp
+    ret

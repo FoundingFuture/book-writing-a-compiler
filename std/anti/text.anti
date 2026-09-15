@@ -1,0 +1,45 @@
+//! Operations on `str` values.
+//!
+//! A `str` holds UTF-8 bytes and their count. `from_c` makes one from a C
+//! string, and `equal` compares two by their bytes.
+
+extern fn memcmp(a: *byte, b: *byte, count: c_size_t) -> c_int;
+extern fn anti_rt_text_from_c(bytes: *byte) -> str;
+
+/// Whether `a` and `b` hold the same bytes.
+pub fn equal(a: str, b: str) -> bool
+{
+	if a.len != b.len {
+		return false;
+	}
+	return a.len == 0 || memcmp(a.ptr, b.ptr, a.len as c_size_t) == 0;
+}
+
+/// The `str` of the NUL-terminated C string at `bytes`, without the NUL.
+///
+/// The `str` points into the C string, which must outlive it.
+pub fn from_c(bytes: *byte) -> str
+{
+	return anti_rt_text_from_c(bytes);
+}
+
+/// The number of bytes of `s`.
+pub fn byte_count(s: str) -> int
+{
+	return s.len;
+}
+
+/// The number of characters of `s`, counted as the bytes that start a
+/// UTF-8 sequence.
+pub fn char_count(s: str) -> int
+{
+	let count = 0;
+	let i = 0;
+	while i < s.len do {
+		if (s[i] & 0xC0) != 0x80 {
+			count += 1;
+		}
+		i += 1;
+	}
+	return count;
+}

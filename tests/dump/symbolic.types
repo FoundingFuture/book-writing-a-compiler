@@ -1,0 +1,48 @@
+struct_decl H
+  field tag                byte
+    type u8
+  field n                  i32
+    type i32
+const_decl N               int
+  type int
+  multiplicative *         int
+    size_of                int
+      type H
+    int_lit 2              int
+struct_decl B
+  field bytes              [size_of(H) * 2]byte
+    type [N]
+      ident N              int
+      type byte
+  field more               [size_of(H) * 2]byte
+    type [N]
+      multiplicative *     int
+        size_of            int
+          type H
+        int_lit 2          int
+      type byte
+function f                 fn(*B) -> int
+  param b                  *B
+    type *
+      type B
+  result
+    type int
+  block
+    let_stmt copy          [size_of(H) * 2]byte
+      type [N]
+        ident N            int
+        type byte
+      field more           [size_of(H) * 2]byte
+        ident b            *B
+    let_stmt fill          [(size_of(H) * 2) - 1]int
+      array_lit ;          [(size_of(H) * 2) - 1]int
+        int_lit 0          int
+        additive -         int
+          ident N          int
+          int_lit 1        int
+    return_stmt
+      additive +           int
+        field len          int
+          ident copy       [size_of(H) * 2]byte
+        field len          int
+          ident fill       [(size_of(H) * 2) - 1]int

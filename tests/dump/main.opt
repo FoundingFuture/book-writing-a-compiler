@@ -1,0 +1,10 @@
+fn main.scale(%0: i64) -> i64 {
+b0:
+    %1 = mul i64 %0, 6
+    ret i64 %1
+}
+fn main.main() -> i64 {
+b0:
+    %0 = call i64 @main.scale(7)
+    ret i64 %0
+}

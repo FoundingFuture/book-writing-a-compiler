@@ -1,0 +1,19 @@
+fn sum(p: *i32, n: int) -> int
+{
+	let s = 0;
+	let i = 0;
+	while i < n do {
+		s += p[i] as int;
+		i += 1;
+	}
+	return s;
+}
+
+fn fill(p: *i16, n: int)
+{
+	let i = 0;
+	while i < n do {
+		p[i] = 7;
+		i += 1;
+	}
+}

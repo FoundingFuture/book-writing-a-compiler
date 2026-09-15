@@ -1,0 +1,5 @@
+fn main() -> int
+{
+	let flag: bool = 1;
+	return flag;
+}

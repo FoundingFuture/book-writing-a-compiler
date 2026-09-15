@@ -1,0 +1,7 @@
+target          format  convention      triple
+linux-x86_64    ELF     System V AMD64  x86_64-unknown-linux-gnu
+linux-arm64     ELF     AAPCS64         aarch64-unknown-linux-gnu
+macos-x86_64    Mach-O  System V AMD64  x86_64-apple-macos
+macos-arm64     Mach-O  Apple ARM64     arm64-apple-macos
+windows-x86_64  COFF    Windows x64     x86_64-pc-windows-msvc
+windows-arm64   COFF    Windows ARM64   aarch64-pc-windows-msvc

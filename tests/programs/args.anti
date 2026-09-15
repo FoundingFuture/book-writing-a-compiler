@@ -1,0 +1,38 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+fn show(s: str)
+{
+	printf("[%.*s] %d\n".ptr, s.len as i32, s.ptr, s.len as i32);
+}
+
+fn starts_with(s: str, prefix: []byte) -> bool
+{
+	if s.len < prefix.len {
+		return false;
+	}
+	let i = 0;
+	while i < prefix.len do {
+		if s[i] != prefix[i] {
+			return false;
+		}
+		i += 1;
+	}
+	return true;
+}
+
+fn main(args: []str, env: []str) -> int
+{
+	let i = 1;
+	while i < args.len do {
+		show(args[i]);
+		i += 1;
+	}
+	let j = 0;
+	while j < env.len do {
+		if starts_with(env[j], b"ANTI_TEST_GREETING=") {
+			show(env[j]);
+		}
+		j += 1;
+	}
+	return args.len;
+}

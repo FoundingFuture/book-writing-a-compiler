@@ -1,0 +1,5 @@
+fn f() -> c_long
+{
+	let x: c_long = 65536;
+	return x * 70000;
+}

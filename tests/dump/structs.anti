@@ -1,0 +1,36 @@
+struct Pair
+{
+	a: int,
+	b: f64,
+}
+
+struct Big
+{
+	a: int,
+	b: int,
+	c: int,
+}
+
+struct Rgb
+{
+	r: u8,
+	g: u8,
+	b: u8,
+}
+
+struct V2
+{
+	x: f32,
+	y: f32,
+}
+
+extern fn take(p: Pair, big: Big, c: Rgb, v: V2) -> Pair;
+extern fn make(n: int) -> Big;
+
+fn call(p: Pair, big: Big, c: Rgb, v: V2) -> Pair
+{
+	let m = make(p.a);
+	let q = take(p, m, c, v);
+	q.a = q.a + big.c;
+	return q;
+}

@@ -1,0 +1,6 @@
+fn main.bytes(%0: i64) -> i64 {
+b0:
+    %1 = mul i64 %0, size_of i64
+    %2 = add i64 mul i64(size_of i32, 2), %1
+    ret i64 %2
+}

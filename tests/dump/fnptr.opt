@@ -1,0 +1,32 @@
+type fnptr.Op = struct { apply: ptr }
+type [2]fnptr.Op = array 2 of fnptr.Op
+extern fn abs(i32) -> i32
+extern fn fnptr.fn.0(i32) -> i32
+fn fnptr.twice(%0: i32) -> i32 {
+b0:
+    %1 = shl i32 %0, 1
+    ret i32 %1
+}
+fn fnptr.run(%0: ptr, %1: i32) -> i32 {
+b0:
+    %2 = load ptr %0
+    %3 = call i32 %2 via @fnptr.fn.0(%1)
+    ret i32 %3
+}
+fn fnptr.main() -> i64 {
+b0:
+    %0 = slot [2]fnptr.Op
+    %1 = addr @fnptr.twice
+    store ptr %1, %0
+    %2 = ptradd %0, size_of fnptr.Op
+    %3 = addr @abs
+    store ptr %3, %2
+    %4 = ptradd %0, 0
+    %5 = call i32 @fnptr.run(%4, 5)
+    %6 = sext i64 %5
+    %7 = ptradd %0, size_of fnptr.Op
+    %8 = call i32 @fnptr.run(%7, -3)
+    %9 = sext i64 %8
+    %10 = add i64 %6, %9
+    ret i64 %10
+}

@@ -1,0 +1,10 @@
+import anti.io;
+
+fn main() -> int
+{
+	io.print("one ");
+	io.println("two");
+	io.eprintln("three on standard error");
+	io.exit(7);
+	return 0;
+}

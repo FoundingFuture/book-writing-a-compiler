@@ -1,0 +1,20 @@
+fn quotient() -> int
+{
+	return -9 / 2 + -9 % 2;
+}
+
+fn shifted() -> i32
+{
+	return (-16 >> 2) as i32;
+}
+
+fn compared() -> bool
+{
+	return 3 < 4 && 2.0 != 2.0;
+}
+
+fn undefined() -> int
+{
+	let zero = 0;
+	return 1 / zero;
+}

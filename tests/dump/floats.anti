@@ -1,0 +1,15 @@
+fn keep(p: *f32, a: f64, b: f32) -> f64
+{
+	*p = *p * 0.5 - b;
+	if a < 1.5 || a != a {
+		return -a;
+	}
+	return a / (b as f64);
+}
+
+fn convert(a: i8, b: u64, c: f64, d: f32) -> u64
+{
+	let x = a as f32 + d;
+	let y = b as f64 * c;
+	return (x as f64 + y) as u64 + (c as i32) as u64 + (d as u32) as u64;
+}

@@ -1,0 +1,31 @@
+fn fold.quotient() -> i64 {
+b0:
+    %0 = sdiv i64 -9, 2
+    %1 = srem i64 -9, 2
+    %2 = add i64 %0, %1
+    ret i64 %2
+}
+fn fold.shifted() -> i32 {
+b0:
+    %0 = sshr i64 -16, 2
+    %1 = trunc i32 %0
+    ret i32 %1
+}
+fn fold.compared() -> i8 {
+b0:
+    %0 = slt i8 3, 4
+    %1 = copy i8 %0
+    branch %0, b1, b2
+b1:
+    %2 = fne i8 2, 2
+    %1 = copy i8 %2
+    jump b2
+b2:
+    ret i8 %1
+}
+fn fold.undefined() -> i64 {
+b0:
+    %0 = copy i64 0
+    %1 = sdiv i64 1, %0
+    ret i64 %1
+}

@@ -1,0 +1,29 @@
+type bitfields.Flags = struct { visible: i32 : 1 zeroext, layer: i32 : 4 zeroext, level: i8 : 3 signext, pad: i16 : 9 zeroext }
+fn bitfields.main() -> i64 {
+b0:
+    %0 = slot bitfields.Flags
+    bitstore i32 1, %0, bitfields.Flags.visible
+    bitstore i32 9, %0, bitfields.Flags.layer
+    bitstore i8 -3, %0, bitfields.Flags.level
+    bitstore i16 300, %0, bitfields.Flags.pad
+    %1 = bitload i32 %0, bitfields.Flags.layer
+    %2 = add i32 %1, 3
+    bitstore i32 %2, %0, bitfields.Flags.layer
+    %3 = bitload i8 %0, bitfields.Flags.level
+    %4 = sub i8 %3, 1
+    bitstore i8 %4, %0, bitfields.Flags.level
+    %5 = bitload i32 %0, bitfields.Flags.visible
+    %6 = zext i64 %5
+    %7 = bitload i32 %0, bitfields.Flags.layer
+    %8 = zext i64 %7
+    %9 = mul i64 %8, 10
+    %10 = add i64 %6, %9
+    %11 = bitload i8 %0, bitfields.Flags.level
+    %12 = sext i64 %11
+    %13 = mul i64 %12, 100
+    %14 = add i64 %10, %13
+    %15 = bitload i16 %0, bitfields.Flags.pad
+    %16 = zext i64 %15
+    %17 = add i64 %14, %16
+    ret i64 %17
+}

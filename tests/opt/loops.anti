@@ -1,0 +1,14 @@
+fn count(n: int) -> int
+{
+	let i = 0;
+	do {
+		i += 1;
+		if i == 5 {
+			continue;
+		}
+		if i > 8 {
+			break;
+		}
+	} while i < n
+	return i;
+}

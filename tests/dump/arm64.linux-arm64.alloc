@@ -1,0 +1,46 @@
+arm64.imms:
+b0:
+    and x9, x0, #65280
+    orr x9, x9, #6148914691236517205
+    mov x10, #4660
+    eor x9, x9, x10
+    add x9, x9, #3, lsl #12
+    cmp x9, #7, lsl #12
+    b.ge b2
+b1:
+    sub x0, x9, #2, lsl #12
+    ret
+b2:
+    mov x0, x9
+    ret
+arm64.bump:
+b0:
+    add w0, w0, #1
+    ret
+arm64.pass:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #16
+    str x19, [sp, #8]
+    mov w19, w1
+    bl arm64.bump
+    mov w1, w19
+    mov w2, #7
+    bl widen
+    ldr x19, [sp, #8]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret
+arm64.last:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    ldr w9, [x29, #24]
+    ldrb w10, [x29, #32]
+    sxtw x9, w9
+    add x9, x2, x9
+    uxtb w10, w10
+    add x0, x9, x10
+    ldp x29, x30, [sp], #16
+    ret

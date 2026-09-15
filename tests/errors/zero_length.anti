@@ -1,0 +1,11 @@
+struct Pair
+{
+	a: i32,
+	b: i32,
+}
+
+fn main() -> int
+{
+	let x: [size_of(Pair) - 8]byte = [0; size_of(Pair) - 8];
+	return x.len;
+}

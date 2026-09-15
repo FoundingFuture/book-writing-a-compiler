@@ -1,0 +1,5 @@
+pub const SCALE: int = 6;
+pub fn scale(x: int) -> int
+{
+	return x * SCALE;
+}

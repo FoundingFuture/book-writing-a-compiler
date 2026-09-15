@@ -1,0 +1,18 @@
+fn com.example.scale.scale(%0: i64) -> i64 {
+b0:
+    %1 = mul i64 %0, 6
+    ret i64 %1
+}
+fn com.example.twice.twice(%0: i64) -> i64 {
+b0:
+    %1 = call i64 @com.example.scale.scale(%0)
+    %2 = call i64 @com.example.scale.scale(%0)
+    %3 = add i64 %1, %2
+    ret i64 %3
+}
+fn main.main() -> i64 {
+b0:
+    %0 = call i64 @com.example.twice.twice(7)
+    %1 = sdiv i64 %0, 2
+    ret i64 %1
+}

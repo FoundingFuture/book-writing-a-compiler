@@ -1,0 +1,15 @@
+struct H
+{
+	n: i32
+}
+
+const F: f64 = size_of(H) as f64;
+
+fn f(a: [size_of(H)]byte)
+{
+}
+
+struct S
+{
+	a: [size_of(S)]byte
+}

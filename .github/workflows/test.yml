@@ -1,0 +1,93 @@
+# The test suite on the six targets. It runs only when started by hand,
+# because hosted build minutes are limited. A release starts it by hand as
+# well.
+name: test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x86_64
+            runner: ubuntu-24.04
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: macos-arm64
+            runner: macos-15
+          - target: macos-x86_64
+            runner: macos-15-intel
+          - target: windows-x86_64
+            runner: windows-2025
+            msvc: x64
+          - target: windows-arm64
+            runner: windows-11-arm
+            msvc: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      # LLVM publishes archives of the pinned release for Linux and macOS
+      # ARM64, which the script checks against their SHA-256 digests.
+      - name: Install the pinned LLVM tools from the release archive
+        if: matrix.target != 'macos-x86_64' && runner.os != 'Windows'
+        run: sh tools/get-llvm-mc.sh build/toolchain
+
+      # The pinned release has no macOS x86_64 archive. Homebrew's llvm@23
+      # and lld@23 install the major version, and the check below fails
+      # the job unless the versions equal the pin.
+      - name: Install LLVM tools from Homebrew
+        if: matrix.target == 'macos-x86_64'
+        run: |
+          brew install llvm@23 lld@23
+          mkdir -p build/toolchain/bin
+          for tool in llvm-mc llvm-ar llvm-objdump llvm-readobj; do
+            ln -sf "$(brew --prefix llvm@23)/bin/$tool" build/toolchain/bin/$tool
+          done
+          for tool in lld ld.lld ld64.lld lld-link; do
+            ln -sf "$(brew --prefix lld@23)/bin/$tool" build/toolchain/bin/$tool
+          done
+
+      # tools/get-llvm-mc.sh has no Windows download. Chocolatey installs
+      # the version of tools/llvm-version, and the check below fails the
+      # job unless every tool reports that version.
+      - name: Install LLVM tools from Chocolatey
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $pin = (Get-Content tools/llvm-version).Trim()
+          choco install llvm --version $pin --no-progress -y
+          New-Item -ItemType Directory -Force build/toolchain/bin | Out-Null
+          foreach ($tool in "llvm-mc", "llvm-ar", "llvm-objdump", "llvm-readobj", "lld", "ld.lld", "ld64.lld", "lld-link") {
+            Copy-Item "C:/Program Files/LLVM/bin/$tool.exe" build/toolchain/bin/
+          }
+
+      - name: Check that the LLVM tools are the pinned release
+        run: cmake -DLLVM_BIN=build/toolchain/bin -P tools/check-llvm.cmake
+
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc }}
+
+      - name: Install raylib for the ABI tests
+        if: runner.os != 'Windows'
+        run: sh tools/get-raylib.sh build/raylib
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -DANTIC_LLVM_MC="$PWD/build/toolchain/bin/llvm-mc"
+          -DANTIC_LLVM_AR="$PWD/build/toolchain/bin/llvm-ar"
+
+      - name: Build
+        run: cmake --build build --config Debug
+
+      - name: Test
+        run: ctest --test-dir build -C Debug --output-on-failure

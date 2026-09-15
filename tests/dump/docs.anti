@@ -1,0 +1,7 @@
+/// Scale by a factor.
+///
+/// Both operands are int.
+fn scale(x: int) -> int
+{
+	return x * 2;
+}

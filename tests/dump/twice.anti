@@ -1,0 +1,8 @@
+extern fn putchar(c: i32) -> i32;
+
+fn twice(c: i32) -> i32
+{
+	putchar(c);
+	putchar(c);
+	return c;
+}

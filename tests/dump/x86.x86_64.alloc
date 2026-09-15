@@ -1,0 +1,65 @@
+x86.div:
+b0:
+    movq %rdi, %rax
+    cqto
+    idivq %rsi
+    movq %rax, %rcx
+    movq %rdi, %rax
+    cqto
+    idivq %rsi
+    movq %rcx, %rax
+    addq %rdx, %rax
+    ret
+x86.ushift:
+b0:
+    movb %sil, %cl
+    movl %edi, %eax
+    shrl %cl, %eax
+    shll $2, %esi
+    movl $0, %edx
+    divl %esi
+    ret
+x86.bytes:
+b0:
+    imull $3, %edi, %eax
+    movzbq %al, %rax
+    addb $1, %sil
+    movsbq %sil, %rcx
+    addq %rcx, %rax
+    ret
+x86.narrow:
+b0:
+    movswl %si, %ecx
+    movswl %di, %eax
+    cltd
+    idivl %ecx
+    movw %ax, %cx
+    movswl %si, %r8d
+    movswl %di, %eax
+    cltd
+    idivl %r8d
+    cmpw %si, %di
+    jge b2
+b1:
+    movl %ecx, %eax
+    imull %edx, %eax
+    ret
+b2:
+    sarw $1, %cx
+    shlw $3, %dx
+    movw %cx, %ax
+    xorw %dx, %ax
+    ret
+x86.shifts:
+b0:
+    movb %sil, %cl
+    movq %rdi, %rax
+    shlq %cl, %rax
+    movb %sil, %cl
+    movq %rdi, %rdx
+    sarq %cl, %rdx
+    addq %rdx, %rax
+    movb %sil, %cl
+    shrq %cl, %rdi
+    addq %rdi, %rax
+    ret

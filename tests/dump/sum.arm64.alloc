@@ -1,0 +1,31 @@
+sum.sum:
+b0:
+    mov x9, #0
+    mov x10, #0
+b1:
+    cmp x10, x1
+    b.ge b3
+b2:
+    ldr w11, [x0, x10, lsl #2]
+    sxtw x11, w11
+    add x9, x9, x11
+    add x10, x10, #1
+    b b1
+b3:
+    mov x0, x9
+    ret
+sum.fill:
+b0:
+    mov x9, #0
+b1:
+    cmp x9, x1
+    b.ge b3
+b2:
+    lsl x10, x9, #1
+    add x10, x0, x10
+    mov w11, #7
+    strh w11, [x10]
+    add x9, x9, #1
+    b b1
+b3:
+    ret

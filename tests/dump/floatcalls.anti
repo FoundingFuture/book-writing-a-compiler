@@ -1,0 +1,15 @@
+extern fn printf(format: *byte, ...) -> i32;
+extern fn mix(a: int, x: f64, b: int, y: f32) -> f64;
+extern fn nine(a: f64, b: f64, c: f64, d: f64, e: f64, f: f64, g: f64, h: f64, i: f32, j: f32) -> f32;
+
+fn calls(p: *byte, v: f64) -> f64
+{
+	printf(p, v, 3);
+	return mix(1, v, 2, 0.5) + nine(v, v, v, v, v, v, v, v, 1.0, 2.0) as f64;
+}
+
+fn last(a: f64, b: f64, c: f64, d: f64, e: f64, f: f64, g: f64, h: f64,
+	i: f32, j: f32) -> f32
+{
+	return j;
+}

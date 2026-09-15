@@ -1,0 +1,8 @@
+import anti.io;
+import anti.license;
+
+fn main() -> int
+{
+	io.print(license.text());
+	return 0;
+}

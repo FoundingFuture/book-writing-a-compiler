@@ -1,0 +1,5 @@
+/// Twice x.
+export fn other_twice(x: c_int) -> c_int
+{
+	return 2 * x;
+}

@@ -1,0 +1,13 @@
+main.scale:
+b0:
+    movq %rdi, %t0
+    imulq $6, %t0, %t1
+    movq %t1, %rax
+    ret
+main.main:
+b0:
+    movq $7, %rdi
+    call main.scale
+    movq %rax, %t0
+    movq %t0, %rax
+    ret

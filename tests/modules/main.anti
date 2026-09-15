@@ -1,0 +1,6 @@
+import com.example.twice;
+
+fn main() -> int
+{
+	return twice.twice(7) / 2;
+}

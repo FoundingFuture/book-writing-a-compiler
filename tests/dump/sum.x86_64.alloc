@@ -1,0 +1,27 @@
+sum.sum:
+b0:
+    movq $0, %rax
+    movq $0, %rcx
+b1:
+    cmpq %rsi, %rcx
+    jge b3
+b2:
+    movl (%rdi,%rcx,4), %edx
+    movslq %edx, %rdx
+    addq %rdx, %rax
+    addq $1, %rcx
+    jmp b1
+b3:
+    ret
+sum.fill:
+b0:
+    movq $0, %rax
+b1:
+    cmpq %rsi, %rax
+    jge b3
+b2:
+    movw $7, (%rdi,%rax,2)
+    addq $1, %rax
+    jmp b1
+b3:
+    ret

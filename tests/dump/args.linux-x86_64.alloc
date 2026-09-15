@@ -1,0 +1,41 @@
+args.eight:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    movq 24(%rbp), %rax
+    movq %rdi, %rcx
+    addq %rax, %rcx
+    movq %rcx, %rax
+    popq %rbp
+    ret
+args.main:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $32, %rsp
+    movq %rbx, 24(%rsp)
+    movq $4, %rdi
+    call malloc
+    movq %rax, %rbx
+    movb $37, (%rbx)
+    movb $100, 1(%rbx)
+    movb $10, 2(%rbx)
+    movb $0, 3(%rbx)
+    movq $7, (%rsp)
+    movq $8, 8(%rsp)
+    movq $1, %rdi
+    movq $2, %rsi
+    movq $3, %rdx
+    movq $4, %rcx
+    movq $5, %r8
+    movq $6, %r9
+    call args.eight
+    movq %rbx, %rdi
+    movq %rax, %rsi
+    movl $0, %eax
+    call printf
+    movq $0, %rax
+    movq 24(%rsp), %rbx
+    movq %rbp, %rsp
+    popq %rbp
+    ret

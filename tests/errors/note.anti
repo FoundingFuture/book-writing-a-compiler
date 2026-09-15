@@ -1,0 +1,10 @@
+//# Keeps the cache warm.
+pub fn warm() -> int
+{
+	return 1;
+}
+
+fn main() -> int
+{
+	return warm() - 1;
+}

@@ -1,0 +1,17 @@
+fn fold.quotient() -> i64 {
+b0:
+    ret i64 -5
+}
+fn fold.shifted() -> i32 {
+b0:
+    ret i32 -4
+}
+fn fold.compared() -> i8 {
+b0:
+    ret i8 0
+}
+fn fold.undefined() -> i64 {
+b0:
+    %0 = sdiv i64 1, 0
+    ret i64 %0
+}

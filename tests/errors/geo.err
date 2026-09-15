@@ -1,0 +1,4 @@
+geo.anti:8:2: error: the field `name` of export struct `S` has type `str`, which C cannot represent
+geo.anti:11:13: error: the parameter `v` of export fn `f` has type `*V`, and `V` is not exported
+geo.anti:11:20: error: the parameter `s` of export fn `f` has type `str`, which C cannot represent
+geo.anti:16:11: error: `main` is the entry of the program and cannot be exported

@@ -1,0 +1,19 @@
+loop.g:
+b0:
+    mov t0, x0
+    mov t1, #0
+b1:
+    cmp t1, t0
+    b.ge b3
+b2:
+    add t1, t1, #1
+    b b1
+b3:
+    cmp t1, #3
+    b.le b5
+b4:
+    mov x0, #1
+    ret
+b5:
+    mov x0, #0
+    ret

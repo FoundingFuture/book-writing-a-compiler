@@ -1,0 +1,25 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+fn eleven(a: u8, b: i16, c: int, d: int, e: int, f: int, g: int, h: int,
+	i: i8, j: i32, k: u8) -> int
+{
+	return a as int + b as int + c + d + e + f + g + h + i as int +
+		j as int + k as int;
+}
+
+fn main() -> int
+{
+	let format = alloc(byte, 9);
+	format[0] = 37;
+	format[1] = 108;
+	format[2] = 100;
+	format[3] = 32;
+	format[4] = 37;
+	format[5] = 108;
+	format[6] = 100;
+	format[7] = 10;
+	format[8] = 0;
+	printf(format, eleven(250, -3, 1, 2, 3, 4, 5, 6, -7, 100000, 200), 42);
+	free(format);
+	return 0;
+}

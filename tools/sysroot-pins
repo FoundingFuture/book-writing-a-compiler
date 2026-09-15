@@ -1,0 +1,22 @@
+# The pinned components of the sysroots that tools/get-sysroot.sh installs,
+# with the SHA-256 digest of each file at its first download.
+ALPINE_URL=https://dl-cdn.alpinelinux.org/alpine/v3.24/main
+MUSL_VERSION=1.2.6
+MUSL_APK=1.2.6-r2
+MUSL_DEV_X86_64=6831e8b9e4821dae2c9121f0641f81e543f4ac27c03144c4876980ee84e6988f
+MUSL_DEV_AARCH64=ca72b84f4eb3c36bbbec04d919eb10159d414c7a43413cc2253841d301fa9486
+MUSL_SOURCE_URL=https://musl.libc.org/releases/musl-1.2.6.tar.gz
+MUSL_SOURCE_DIGEST=d585fd3b613c66151fc3249e8ed44f77020cb5e6c1e635a616d3f9f82460512a
+COMPILER_RT_APK=22.1.3-r0
+COMPILER_RT_MAJOR=22
+COMPILER_RT_X86_64=1775eb9ba0aa9d465820ee7eb6918390973389f1f32b15378a9cc9c554ce5ee2
+COMPILER_RT_AARCH64=4339f4d0ea4e3c0825ce164e9b26289af894c852005f1f08dcd17709d1d9def5
+COMPILER_RT_LICENSE_URL=https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-22.1.3/compiler-rt/LICENSE.TXT
+COMPILER_RT_LICENSE_DIGEST=1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d
+# The Windows sysroots: xwin with the CRT and SDK versions below. The digest
+# covers the regular files of the tree that xwin writes for each target.
+XWIN_VERSION=0.10.0
+XWIN_CRT_VERSION=14.44.17.14
+XWIN_SDK_VERSION=10.0.26100
+XWIN_TREE_X86_64=8574fd515e077867db8b43de9ecdb3f2b344bdecd6f360a8c2be2ebf6b4f608e
+XWIN_TREE_AARCH64=4c1b8ae7edd23ed5f0389465c84f39176d862e7b9a232b7787f8d36c27bcabbc

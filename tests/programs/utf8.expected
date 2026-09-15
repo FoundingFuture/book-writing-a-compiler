@@ -1,0 +1,7 @@
+exit 4
+10 bytes, equal lengths 1
+U+0061 in 1 bytes
+U+00F1 in 2 bytes
+U+20AC in 3 bytes
+euro at byte 3
+U+1F600 in 4 bytes

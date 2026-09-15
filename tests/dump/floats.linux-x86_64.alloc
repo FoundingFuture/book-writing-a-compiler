@@ -1,0 +1,74 @@
+floats.keep:
+b0:
+    movsd %xmm0, %xmm2
+    movss (%rdi), %xmm0
+    movl $1056964608, %eax
+    movd %eax, %xmm3
+    mulss %xmm3, %xmm0
+    subss %xmm1, %xmm0
+    movss %xmm0, (%rdi)
+    movabsq $4609434218613702656, %rax
+    movq %rax, %xmm0
+    ucomisd %xmm2, %xmm0
+    seta %al
+    testb %al, %al
+    je b3
+b1:
+    movabsq $-9223372036854775808, %rax
+    movq %rax, %xmm0
+    movsd %xmm2, %xmm3
+    xorpd %xmm0, %xmm3
+    movsd %xmm3, %xmm0
+    ret
+b2:
+    cvtss2sd %xmm1, %xmm0
+    movsd %xmm2, %xmm3
+    divsd %xmm0, %xmm3
+    movsd %xmm3, %xmm0
+    ret
+b3:
+    ucomisd %xmm2, %xmm2
+    setne %al
+    setp %cl
+    orb %cl, %al
+    testb %al, %al
+    jne b1
+    jmp b2
+floats.convert:
+b0:
+    movsbl %dil, %eax
+    cvtsi2ssl %eax, %xmm2
+    addss %xmm1, %xmm2
+    movq %rsi, %rax
+    shrq $1, %rax
+    movl %esi, %ecx
+    andl $1, %ecx
+    orq %rcx, %rax
+    cvtsi2sdq %rax, %xmm3
+    addsd %xmm3, %xmm3
+    cvtsi2sdq %rsi, %xmm4
+    sarq $63, %rsi
+    movq %rsi, %xmm5
+    andpd %xmm5, %xmm3
+    andnpd %xmm4, %xmm5
+    orpd %xmm5, %xmm3
+    mulsd %xmm0, %xmm3
+    cvtss2sd %xmm2, %xmm2
+    addsd %xmm3, %xmm2
+    cvttsd2si %xmm2, %rax
+    movabsq $4890909195324358656, %rcx
+    movq %rcx, %xmm3
+    movsd %xmm2, %xmm4
+    subsd %xmm3, %xmm4
+    cvttsd2si %xmm4, %rcx
+    movabsq $-9223372036854775808, %rdx
+    xorq %rdx, %rcx
+    ucomisd %xmm3, %xmm2
+    cmovaeq %rcx, %rax
+    cvttsd2si %xmm0, %ecx
+    movslq %ecx, %rcx
+    addq %rcx, %rax
+    cvttss2si %xmm1, %rcx
+    movl %ecx, %ecx
+    addq %rcx, %rax
+    ret

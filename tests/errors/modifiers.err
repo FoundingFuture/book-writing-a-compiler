@@ -1,0 +1,4 @@
+modifiers.anti:11:14: error: a bitfield of `byte` has 1 to 8 bits
+modifiers.anti:14:16: error: an alignment is a power of two
+modifiers.anti:21:10: error: a literal of union `Value` names exactly one field
+modifiers.anti:22:11: error: a bitfield has no address
