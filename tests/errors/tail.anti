@@ -1,0 +1,10 @@
+struct Tail
+{
+	pad: [size_of(c_long) - 6]byte,
+}
+
+fn main() -> int
+{
+	let t = Tail { pad: [0; size_of(c_long) - 6] };
+	return t.pad[0] as int;
+}

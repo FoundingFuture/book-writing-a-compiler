@@ -1,0 +1,9 @@
+struct Low align(2)
+{
+	a: i32,
+}
+
+fn main() -> int
+{
+	return size_of(Low);
+}

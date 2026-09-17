@@ -1,0 +1,22 @@
+type structs.Pair = struct { a: i64, b: f64 }
+type structs.Big = struct { a: i64, b: i64, c: i64 }
+type structs.Rgb = struct { r: i8, g: i8, b: i8 }
+type structs.V2 = struct { x: f32, y: f32 }
+extern fn take(agg structs.Pair, agg structs.Big, agg structs.Rgb, agg structs.V2) -> agg structs.Pair
+extern fn make(i64) -> agg structs.Big
+fn structs.call(%0: agg structs.Pair, %1: agg structs.Big, %2: agg structs.Rgb, %3: agg structs.V2) -> agg structs.Pair {
+b0:
+    %4 = slot structs.Big
+    %5 = slot structs.Pair
+    %6 = load i64 %0
+    %7 = call agg @make(%6)
+    memcopy %4, %7, structs.Big
+    %8 = call agg @take(%0, %4, %2, %3)
+    memcopy %5, %8, structs.Pair
+    %9 = load i64 %5
+    %10 = ptradd %1, offset_of structs.Big.c
+    %11 = load i64 %10
+    %12 = add i64 %9, %11
+    store i64 %12, %5
+    ret ptr %5
+}

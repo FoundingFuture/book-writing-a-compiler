@@ -1,0 +1,42 @@
+type []byte = struct { ptr: ptr, len: i64 }
+type str = struct { ptr: ptr, len: i64 }
+extern fn puts(ptr) -> i32
+global strings.0 size 6 align 1 bytes 68 65 6c 6c 6f 00
+global strings.1 size 3 align 1 bytes 68 69 00
+fn strings.tail(%0: agg str, %1: i64) -> agg []byte {
+b0:
+    %2 = slot []byte
+    %3 = load ptr %0
+    %4 = ptradd %0, offset_of str.len
+    %5 = load i64 %4
+    %6 = mul i64 %1, size_of i8
+    %7 = ptradd %3, %6
+    store ptr %7, %2
+    %8 = sub i64 %5, %1
+    %9 = ptradd %2, offset_of []byte.len
+    store i64 %8, %9
+    ret ptr %2
+}
+fn strings.main() -> i64 {
+b0:
+    %0 = slot []byte
+    %1 = slot str
+    %2 = slot str
+    %3 = addr @strings.0
+    store ptr %3, %1
+    %4 = ptradd %1, offset_of str.len
+    store i64 5, %4
+    %5 = call agg @strings.tail(%1, 1)
+    memcopy %0, %5, []byte
+    %6 = addr @strings.1
+    store ptr %6, %2
+    %7 = ptradd %2, offset_of str.len
+    store i64 2, %7
+    %8 = load ptr %2
+    %9 = call i32 @puts(%8)
+    %10 = load ptr %0
+    %11 = ptradd %10, 0
+    %12 = load i8 %11
+    %13 = zext i64 %12
+    ret i64 %13
+}

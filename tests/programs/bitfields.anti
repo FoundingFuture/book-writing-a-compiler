@@ -1,0 +1,16 @@
+struct Flags
+{
+	visible: u32 : 1,
+	layer: u32 : 4,
+	level: i8 : 3,
+	pad: u16 : 9,
+}
+
+fn main() -> int
+{
+	let f = Flags { visible: 1, layer: 9, level: -3, pad: 300 };
+	f.layer += 3;
+	f.level = f.level - 1;
+	return f.visible as int + f.layer as int * 10 + f.level as int * 100 +
+		f.pad as int;
+}

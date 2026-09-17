@@ -1,0 +1,38 @@
+args.eight:
+b0:
+    add x0, x0, x7
+    ret
+args.main:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #16
+    str x19, [sp, #8]
+    mov x0, #4
+    bl malloc
+    mov x19, x0
+    mov w9, #37
+    strb w9, [x19]
+    mov w9, #100
+    strb w9, [x19, #1]
+    mov w9, #10
+    strb w9, [x19, #2]
+    strb wzr, [x19, #3]
+    mov x0, #1
+    mov x1, #2
+    mov x2, #3
+    mov x3, #4
+    mov x4, #5
+    mov x5, #6
+    mov x6, #7
+    mov x7, #8
+    bl args.eight
+    mov x9, x0
+    mov x0, x19
+    mov x1, x9
+    bl printf
+    mov x0, #0
+    ldr x19, [sp, #8]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret

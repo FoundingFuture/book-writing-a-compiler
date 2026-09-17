@@ -1,0 +1,6 @@
+fn main() -> int
+{
+	let s = "tab\q";
+	let c = 'ab';
+	return 1;
+}

@@ -1,0 +1,64 @@
+# The test suite on the six targets. It runs only when started by hand,
+# because hosted build minutes are limited. A release starts it by hand as
+# well.
+name: test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x86_64
+            runner: ubuntu-24.04
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: macos-arm64
+            runner: macos-15
+          - target: macos-x86_64
+            runner: macos-15-intel
+          - target: windows-x86_64
+            runner: windows-2025
+            msvc: x64
+          - target: windows-arm64
+            runner: windows-11-arm
+            msvc: arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      # The script installs the pinned tools on every host that
+      # tools/llvm-pin names, and checks the archive against its SHA-256
+      # digest. Every host has an archive.
+      - name: Install the pinned LLVM tools
+        run: cmake -DDEST=build/toolchain -P tools/get-llvm.cmake
+
+      - name: Check that the LLVM tools are the pinned release
+        run: cmake -DLLVM_BIN=build/toolchain/bin -P tools/check-llvm.cmake
+
+      - name: Set up the MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc }}
+
+      - name: Install raylib for the ABI tests
+        if: runner.os != 'Windows'
+        run: cmake -DDEST=build/raylib -P tools/get-raylib.cmake
+
+      - name: Configure
+        shell: bash
+        run: >
+          cmake -S . -B build
+          -DANTIC_LLVM_MC="$PWD/build/toolchain/bin/llvm-mc"
+          -DANTIC_LLVM_AR="$PWD/build/toolchain/bin/llvm-ar"
+
+      - name: Build
+        run: cmake --build build --config Debug
+
+      - name: Test
+        run: ctest --test-dir build -C Debug --output-on-failure

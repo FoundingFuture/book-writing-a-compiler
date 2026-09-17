@@ -1,0 +1,17 @@
+fn g(n: int) -> int
+{
+	let i = 0;
+	while i < n do {
+		i += 1;
+	}
+	if i > 3 {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+fn main() -> int
+{
+	return g(10) + g(2) * 10;
+}

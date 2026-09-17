@@ -1,0 +1,79 @@
+extern fn printf(format: *byte, ...) -> i32;
+extern fn qsort(base: *byte, count: u64, size: u64,
+	compare: fn(*byte, *byte) -> i32);
+extern fn abs(x: i32) -> i32;
+
+struct Shape
+{
+	area: fn(*Shape) -> f64,
+	size: f64,
+}
+
+fn square_area(s: *Shape) -> f64
+{
+	return s.size * s.size;
+}
+
+fn circle_area(s: *Shape) -> f64
+{
+	return 3.0 * s.size * s.size;
+}
+
+fn scale(s: *Shape, k: f64)
+{
+	s.size *= k;
+}
+
+// qsort passes pointers to two elements of the array.
+fn descending(a: *byte, b: *byte) -> i32
+{
+	let x = *(a as *i32);
+	let y = *(b as *i32);
+	if x < y {
+		return 1;
+	}
+	if x > y {
+		return -1;
+	}
+	return 0;
+}
+
+fn apply(f: fn(i32) -> i32, values: []i32)
+{
+	let i = 0;
+	while i < values.len do {
+		values[i] = f(values[i]);
+		i += 1;
+	}
+}
+
+fn negate(x: i32) -> i32
+{
+	return -x;
+}
+
+fn main() -> int
+{
+	let shapes = [Shape { area: square_area, size: 2.0 },
+		Shape { area: circle_area, size: 1.0 }];
+	shapes[0].scale(1.5);
+	let i = 0;
+	while i < shapes.len do {
+		let s = &shapes[i];
+		printf("%.2f\n".ptr, s.area(s));
+		i += 1;
+	}
+
+	let numbers = [3 as i32, -7, 12, 0, -1];
+	apply(abs, numbers[0..5]);
+	qsort(&numbers[0] as *byte, 5, 4, descending);
+	apply(negate, numbers[3..5]);
+	printf("%d %d %d %d %d\n".ptr, numbers[0], numbers[1], numbers[2],
+		numbers[3], numbers[4]);
+
+	let chosen: fn(i32) -> i32 = null;
+	if chosen == null {
+		chosen = negate;
+	}
+	return (chosen(-42) + (abs == abs) as i32) as int;
+}

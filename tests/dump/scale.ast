@@ -1,0 +1,14 @@
+function scale
+  param x
+    type int
+  result
+    type int
+  block
+    let_stmt k
+      additive +
+        int_lit 2
+        int_lit 4
+    return_stmt
+      multiplicative *
+        ident x
+        ident k

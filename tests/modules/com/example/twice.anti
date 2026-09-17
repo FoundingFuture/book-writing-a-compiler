@@ -1,0 +1,6 @@
+import com.example.scale;
+
+pub fn twice(x: int) -> int
+{
+	return scale.scale(x) + scale.scale(x);
+}

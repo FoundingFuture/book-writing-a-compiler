@@ -1,0 +1,21 @@
+# Where the LLVM tools of each host come from. A host with a URL takes
+# them from that release archive, whose SHA-256 digest is the one on the
+# release page. A host marked built takes them from a build of our own,
+# because the Linux release needs the ICU of one distribution. The
+# version stands in tools/llvm-version alone, and @VERSION@ below takes
+# it. LLVM publishes no archive for macOS on x86_64, so that host is built too.
+macos-x86_64-built=yes
+macos-arm64-url=https://github.com/llvm/llvm-project/releases/download/llvmorg-@VERSION@/LLVM-@VERSION@-macOS-ARM64.tar.xz
+macos-arm64-digest=64220f1c99132ef7e580447781b84f96fbba6862a43a8f6522b423052cd67502
+linux-x86_64-built=yes
+linux-arm64-built=yes
+windows-x86_64-url=https://github.com/llvm/llvm-project/releases/download/llvmorg-@VERSION@/clang+llvm-@VERSION@-x86_64-pc-windows-msvc.tar.xz
+windows-x86_64-digest=c54ac8146b420fe72e11e6fdd56498d6818011ad23267196b6ab37b5ac9264c3
+windows-arm64-url=https://github.com/llvm/llvm-project/releases/download/llvmorg-@VERSION@/clang+llvm-@VERSION@-aarch64-pc-windows-msvc.tar.xz
+windows-arm64-digest=c8cd61f6624accf0d0f9f4519ddcc97745c6a865205bb43f364b6aaf9c50a31e
+# The source of the release, which tools/build-llvm.cmake compiles for a
+# host that has no archive of its own.
+source-url=https://github.com/llvm/llvm-project/releases/download/llvmorg-@VERSION@/llvm-project-@VERSION@.src.tar.xz
+source-digest=ebe9be46fe8756d58c5b198ffad0fa2a766257add81a4dc52179bfacc7888ee6
+license-url=https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-@VERSION@/llvm/LICENSE.TXT
+license-digest=8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee

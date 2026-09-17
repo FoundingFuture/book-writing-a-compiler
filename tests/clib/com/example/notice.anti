@@ -1,0 +1,9 @@
+//! A library for C that reads the licence notice of the program.
+
+import anti.license;
+
+/// The number of bytes in the notice, which is 0 in a static library.
+export fn notice_length() -> c_int
+{
+	return license.text().len as c_int;
+}

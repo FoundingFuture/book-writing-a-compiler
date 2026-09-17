@@ -1,0 +1,22 @@
+struct V2
+{
+	x: f32,
+	y: f32,
+}
+
+fn length_of(s: str) -> int
+{
+	return s.len;
+}
+
+fn sum(v: V2) -> int
+{
+	return (v.x + v.y) as int;
+}
+
+fn main() -> int
+{
+	let f = length_of;
+	let g = sum;
+	return f("four") + g(V2 { x: 1.5, y: 1.5 });
+}

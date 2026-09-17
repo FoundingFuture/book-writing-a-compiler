@@ -1,0 +1,20 @@
+struct H
+{
+	tag: u8,
+	n: i32
+}
+
+const N: int = size_of(H) * 2;
+
+struct B
+{
+	bytes: [N]byte,
+	more: [size_of(H) * 2]byte
+}
+
+fn f(b: *B) -> int
+{
+	let copy: [N]byte = b.more;
+	let fill = [0; N - 1];
+	return copy.len + fill.len;
+}

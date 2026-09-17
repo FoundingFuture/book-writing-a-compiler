@@ -1,0 +1,31 @@
+extern fn putchar(c: i32) -> i32;
+
+fn div(a: int, b: int) -> int
+{
+	return a / b + a % b;
+}
+
+fn ushift(a: u32, b: u32) -> u32
+{
+	return (a >> b) / (b << 2);
+}
+
+fn bytes(a: u8, b: i8) -> int
+{
+	return (a * 3) as int + (b + 1) as int;
+}
+
+fn narrow(a: i16, b: i16) -> i16
+{
+	let q = a / b;
+	let r = a % b;
+	if a < b {
+		return q * r;
+	}
+	return (q >> 1) ^ (r << 3);
+}
+
+fn shifts(a: int, n: int) -> int
+{
+	return (a << n) + (a >> n) + ((a as u64 >> n as u64) as int);
+}

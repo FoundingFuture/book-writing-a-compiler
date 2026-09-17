@@ -1,0 +1,222 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+struct Pair
+{
+	a: int,
+	b: f64,
+}
+
+struct Big
+{
+	a: int,
+	b: int,
+	c: int,
+}
+
+struct Rgb
+{
+	r: u8,
+	g: u8,
+	b: u8,
+}
+
+struct V2
+{
+	x: f32,
+	y: f32,
+}
+
+struct Mixed
+{
+	i: i32,
+	f: f32,
+}
+
+struct Quad
+{
+	a: f64,
+	b: f64,
+	c: f64,
+	d: f64,
+}
+
+struct Odd
+{
+	a: i16,
+	b: i8,
+	c: [3]u8,
+}
+
+struct Tri
+{
+	a: f64,
+	b: f64,
+	c: f64,
+}
+
+struct Huge
+{
+	v: [12]int,
+	f: f32,
+}
+
+union Num
+{
+	i: int,
+	d: f64,
+}
+
+union FF
+{
+	a: f32,
+	b: f32,
+}
+
+union Mix
+{
+	f: f32,
+	i: i32,
+}
+
+struct Holder
+{
+	tag: i8,
+	n: Num,
+}
+
+packed struct Tight
+{
+	a: i8,
+	b: i32,
+}
+
+struct Wide align(16)
+{
+	a: i8,
+}
+
+struct Bits
+{
+	visible: u32 : 1,
+	layer: u32 : 4,
+	level: i8 : 3,
+	pad: u16 : 9,
+}
+
+extern fn abi_pair(p: Pair, k: int) -> Pair;
+extern fn abi_big(b: Big) -> Big;
+extern fn abi_rgb(c: Rgb) -> Rgb;
+extern fn abi_v2(a: V2, b: V2) -> V2;
+extern fn abi_mixed(m: Mixed) -> Mixed;
+extern fn abi_quad(q: Quad) -> Quad;
+extern fn abi_odd(o: Odd) -> Odd;
+extern fn abi_many(a: Rgb, b: Pair, c: Big, d: V2, e: Mixed, f: Quad, g: Odd,
+	h: int, i: f64, j: Pair, k: Big) -> f64;
+extern fn abi_stack(d0: f64, d1: f64, d2: f64, d3: f64, d4: f64, d5: f64,
+	d6: f64, t: Tri, v: V2, f: f32, c: Rgb, u: u8, p: Pair,
+	i0: int, i1: int, i2: int, i3: int, i4: int, i5: int,
+	c2: Rgb, s: i16, v2: V2) -> f64;
+extern fn abi_huge(a: int, h: Huge, d: f64, g: Huge, b: int) -> Huge;
+extern fn abi_num(n: Num) -> Num;
+extern fn abi_ff(u: FF, v: FF) -> FF;
+extern fn abi_mix(m: Mix) -> Mix;
+extern fn abi_holder(h: Holder) -> Holder;
+extern fn abi_tight(t: Tight, k: int) -> Tight;
+extern fn abi_wide(a: int, w: Wide, b: int, c: int, d: int, e: int, f: int,
+	w2: Wide, g: int) -> int;
+extern fn abi_bits(b: Bits) -> Bits;
+extern fn abi_calls_anti(x: int) -> int;
+
+export fn anti_twice(x: int) -> int
+{
+	return 2 * x;
+}
+
+fn int_line(v: int)
+{
+	let format = alloc(byte, 5);
+	format[0] = 37;
+	format[1] = 108;
+	format[2] = 100;
+	format[3] = 10;
+	format[4] = 0;
+	printf(format, v);
+	free(format);
+}
+
+fn float_line(v: f64)
+{
+	let format = alloc(byte, 7);
+	format[0] = 37;
+	format[1] = 46;
+	format[2] = 49;
+	format[3] = 55;
+	format[4] = 103;
+	format[5] = 10;
+	format[6] = 0;
+	printf(format, v);
+	free(format);
+}
+
+fn swap(p: Pair) -> Pair
+{
+	return Pair { a: p.b as int, b: p.a as f64 };
+}
+
+fn main() -> int
+{
+	let p = abi_pair(Pair { a: 40, b: 1.25 }, 2);
+	int_line(p.a);
+	float_line(p.b);
+	let big = abi_big(Big { a: 1, b: 2, c: 3 });
+	int_line(big.a + big.b * 100 + big.c * 10000);
+	let c = abi_rgb(Rgb { r: 10, g: 255, b: 30 });
+	int_line(c.r as int * 65536 + c.g as int * 256 + c.b as int);
+	let v = abi_v2(V2 { x: 1.5, y: 2.0 }, V2 { x: 0.25, y: 3.0 });
+	float_line(v.x as f64);
+	float_line(v.y as f64);
+	let m = abi_mixed(Mixed { i: -7, f: 2.5 });
+	int_line(m.i as int);
+	float_line(m.f as f64);
+	let q = abi_quad(Quad { a: 1.0, b: 2.0, c: 3.0, d: 4.0 });
+	float_line(q.a + q.b * 10.0 + q.c * 100.0 + q.d * 1000.0);
+	let o = abi_odd(Odd { a: 1000, b: -3, c: [1, 2, 3] });
+	int_line(o.a as int);
+	int_line(o.b as int);
+	int_line(o.c[0] as int * 100 + o.c[1] as int * 10 + o.c[2] as int);
+	float_line(abi_many(c, p, big, v, m, q, o, 11, 0.5, swap(p), big));
+	float_line(abi_stack(0.25, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0,
+		Tri { a: 1.5, b: 2.5, c: 3.5 }, V2 { x: 7.5, y: 8.5 },
+		9.25, Rgb { r: 10, g: 20, b: 30 }, 200,
+		Pair { a: -5, b: 0.125 }, 11, 12, 13, 14, 15, 16,
+		Rgb { r: 40, g: 50, b: 60 }, -300,
+		V2 { x: -1.5, y: 2.75 }));
+	let h = Huge { v: [0; 12], f: 0.5 };
+	let g = Huge { v: [0; 12], f: 0.25 };
+	let i = 0;
+	while i < h.v.len do {
+		h.v[i] = i + 1;
+		g.v[i] = 100 * (i + 1);
+		i = i + 1;
+	}
+	let r = abi_huge(3, h, 2.0, abi_huge(1, g, 1.0, h, 2), 7);
+	int_line(r.v[0]);
+	int_line(r.v[11]);
+	float_line(r.f as f64);
+	let n = abi_num(Num { d: 1.5 });
+	float_line(n.d);
+	let ff = abi_ff(FF { a: 1.25 }, FF { b: 2.5 });
+	float_line(ff.b as f64);
+	let mix = abi_mix(Mix { i: 41 });
+	int_line(mix.i as int);
+	let holder = abi_holder(Holder { tag: 6, n: Num { i: 14 } });
+	int_line(holder.tag as int * 100 + holder.n.i);
+	let tight = abi_tight(Tight { a: 4, b: 1000 }, 23);
+	int_line(tight.a as int * 10000 + tight.b as int);
+	int_line(abi_wide(1, Wide { a: 2 }, 3, 4, 5, 6, 7, Wide { a: 8 }, 9));
+	let bits = abi_bits(Bits { visible: 1, layer: 6, level: -2, pad: 400 });
+	int_line(bits.visible as int * 1000000 + bits.layer as int * 10000 +
+		bits.level as int * 1000 + bits.pad as int);
+	int_line(abi_calls_anti(20));
+	return 0;
+}

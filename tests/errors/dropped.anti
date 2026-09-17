@@ -1,0 +1,7 @@
+fn main() -> int
+{
+	/** Not an item. */
+	return 0;
+}
+
+/// Nothing follows.

@@ -1,0 +1,6 @@
+const HEADER: int = size_of(i32) * 2;
+
+fn bytes(n: int) -> int
+{
+	return HEADER + n * size_of(i64);
+}

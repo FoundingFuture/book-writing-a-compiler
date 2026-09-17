@@ -1,0 +1,68 @@
+bitfields.main:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $16, %rsp
+    leaq (%rsp), %rax
+    movb (%rax), %cl
+    andb $-2, %cl
+    orb $1, %cl
+    movb %cl, (%rax)
+    movb (%rax), %cl
+    andb $-31, %cl
+    orb $18, %cl
+    movb %cl, (%rax)
+    movb (%rax), %cl
+    andb $31, %cl
+    orb $-96, %cl
+    movb %cl, (%rax)
+    movq %rax, %rcx
+    addq $2, %rcx
+    movw (%rcx), %dx
+    andw $-512, %dx
+    orw $300, %dx
+    movw %dx, (%rcx)
+    movb (%rax), %cl
+    shrb $1, %cl
+    andb $15, %cl
+    movzbl %cl, %ecx
+    addl $3, %ecx
+    movb (%rax), %dl
+    andb $15, %cl
+    shlb $1, %cl
+    andb $-31, %dl
+    orb %cl, %dl
+    movb %dl, (%rax)
+    movb (%rax), %cl
+    sarb $5, %cl
+    subb $1, %cl
+    movb (%rax), %dl
+    andb $7, %cl
+    shlb $5, %cl
+    andb $31, %dl
+    orb %cl, %dl
+    movb %dl, (%rax)
+    movb (%rax), %cl
+    andb $1, %cl
+    movzbl %cl, %ecx
+    movl %ecx, %ecx
+    movb (%rax), %dl
+    shrb $1, %dl
+    andb $15, %dl
+    movzbl %dl, %edx
+    movl %edx, %edx
+    imulq $10, %rdx, %rdx
+    addq %rdx, %rcx
+    movb (%rax), %dl
+    sarb $5, %dl
+    movsbq %dl, %rdx
+    imulq $100, %rdx, %rdx
+    addq %rdx, %rcx
+    movw 2(%rax), %ax
+    andw $511, %ax
+    movzwq %ax, %rax
+    addq %rax, %rcx
+    movq %rcx, %rax
+    movq %rbp, %rsp
+    popq %rbp
+    ret

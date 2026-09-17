@@ -1,0 +1,41 @@
+/// An integer or a float in 8 bytes.
+export union Num
+{
+	i: i64,
+	d: f64,
+}
+
+/// Five bytes without padding.
+export packed struct Tight
+{
+	tag: u8,
+	value: i32,
+}
+
+export struct Wide align(16)
+{
+	a: i8,
+	flags: u32 : 3,
+}
+
+export struct Holder
+{
+	tags: [4]u8,
+	cb: fn(c_long, *byte) -> bool,
+	next: *Holder,
+	n: Num,
+}
+
+export const HALF: f32 = 0.5;
+export const ON: bool = true;
+export const NAME: str = "shapes";
+
+/// Set n bytes from p to the low byte of w.
+export fn fill(p: *byte, n: c_size_t, w: c_wchar)
+{
+	let i: c_size_t = 0;
+	while i < n do {
+		p[i as int] = w as byte;
+		i += 1;
+	}
+}

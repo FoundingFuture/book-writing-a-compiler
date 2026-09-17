@@ -1,0 +1,13 @@
+extern fn puts(s: *byte) -> i32;
+
+fn tail(s: str, from: int) -> []byte
+{
+	return s[from..s.len];
+}
+
+fn main() -> int
+{
+	let t = tail("hello", 1);
+	puts("hi".ptr);
+	return t[0] as int;
+}

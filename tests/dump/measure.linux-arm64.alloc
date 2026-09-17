@@ -1,0 +1,66 @@
+measure.length_of:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #16
+    add x9, sp, #0
+    str x0, [x9]
+    str x1, [x9, #8]
+    ldr x0, [x9, #8]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret
+measure.sum:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #16
+    add x9, sp, #0
+    str s0, [x9]
+    str s1, [x9, #4]
+    ldr s18, [x9]
+    ldr s19, [x9, #4]
+    fadd s18, s18, s19
+    fcvtzs x0, s18
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret
+measure.main:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #48
+    str x19, [sp, #40]
+    str x20, [sp, #32]
+    str x21, [sp, #24]
+    add x9, sp, #0
+    add x19, sp, #16
+    adrp x10, measure.length_of
+    add x10, x10, :lo12:measure.length_of
+    adrp x20, measure.sum
+    add x20, x20, :lo12:measure.sum
+    adrp x11, measure.0
+    add x11, x11, :lo12:measure.0
+    str x11, [x9]
+    mov x11, #4
+    str x11, [x9, #8]
+    ldr x0, [x9]
+    ldr x1, [x9, #8]
+    blr x10
+    mov x21, x0
+    movz w9, #16320, lsl #16
+    fmov s18, w9
+    str s18, [x19]
+    movz w9, #16320, lsl #16
+    fmov s18, w9
+    str s18, [x19, #4]
+    ldr s0, [x19]
+    ldr s1, [x19, #4]
+    blr x20
+    add x0, x21, x0
+    ldr x19, [sp, #40]
+    ldr x20, [sp, #32]
+    ldr x21, [sp, #24]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret

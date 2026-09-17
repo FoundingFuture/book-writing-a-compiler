@@ -1,0 +1,46 @@
+fnptr.twice:
+b0:
+    movl %edi, %eax
+    shll $1, %eax
+    ret
+fnptr.run:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    movq (%rdi), %rax
+    movl %esi, %edi
+    call *%rax
+    popq %rbp
+    ret
+fnptr.main:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $32, %rsp
+    movq %rbx, 24(%rsp)
+    movq %r12, 16(%rsp)
+    leaq (%rsp), %rbx
+    leaq fnptr.twice(%rip), %rax
+    movq %rax, (%rbx)
+    movq %rbx, %rax
+    addq $8, %rax
+    movq abs@GOTPCREL(%rip), %rcx
+    movq %rcx, (%rax)
+    movq %rbx, %rdi
+    addq $0, %rdi
+    movl $5, %esi
+    call fnptr.run
+    movslq %eax, %r12
+    movq %rbx, %rdi
+    addq $8, %rdi
+    movl $-3, %esi
+    call fnptr.run
+    movslq %eax, %rax
+    movq %r12, %rcx
+    addq %rax, %rcx
+    movq %rcx, %rax
+    movq 24(%rsp), %rbx
+    movq 16(%rsp), %r12
+    movq %rbp, %rsp
+    popq %rbp
+    ret

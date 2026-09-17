@@ -1,0 +1,48 @@
+extern fn puts(s: *byte) -> i32;
+extern fn printf(format: *byte, ...) -> i32;
+
+const WORD: str = "banana";
+
+fn count(s: []byte, b: byte) -> int
+{
+	let n = 0;
+	let i = 0;
+	while i < s.len do {
+		if s[i] == b {
+			n += 1;
+		}
+		i += 1;
+	}
+	return n;
+}
+
+fn fill(s: []int, v: int)
+{
+	let i = 0;
+	while i < s.len do {
+		s[i] = v + i;
+		i += 1;
+	}
+}
+
+fn main() -> int
+{
+	puts(WORD.ptr);
+	let tail = WORD[2..6];
+	printf("%.*s %d\n".ptr, tail.len as i32, tail.ptr, count(tail, 97) as i32);
+
+	let raw = b"raw\x00bytes\xff";
+	printf("%d %d\n".ptr, raw.len as i32, count(raw, 0) as i32);
+
+	let numbers = [0; 6];
+	fill(numbers[2..5], 10);
+	printf("%d %d %d %d\n".ptr, numbers[1] as i32, numbers[2] as i32,
+		numbers[4] as i32, numbers[5] as i32);
+
+	let heap = alloc(int, 3);
+	let view = []int { ptr: heap, len: 3 };
+	fill(view, 100);
+	let sum = heap[0] + heap[1] + heap[2];
+	free(heap);
+	return sum % 256;
+}

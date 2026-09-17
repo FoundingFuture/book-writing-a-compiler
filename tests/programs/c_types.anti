@@ -1,0 +1,10 @@
+extern fn labs(n: c_long) -> c_long;
+extern fn wcslen(s: *c_wchar) -> c_size_t;
+
+fn main() -> int
+{
+	let wide: [4]c_wchar = [72, 105, 33, 0];
+	let big: c_ulong = 4294967295;
+	let n = labs(-40) as int;
+	return n + wcslen(&wide[0]) as int + (big / 4294967295) as int - 1;
+}

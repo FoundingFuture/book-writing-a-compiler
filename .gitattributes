@@ -1,0 +1,8 @@
+# A test compares the output of a program with the bytes of its expected
+# file, so every file in the repository is checked out with line feeds.
+# A carriage return would reach the comparison and fail it.
+* text=auto eol=lf
+
+# A batch file is the one thing that wants the line endings of Windows.
+*.cmd text eol=crlf
+*.bat text eol=crlf

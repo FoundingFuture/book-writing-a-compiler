@@ -1,0 +1,4 @@
+fn helper() -> int
+{
+	return 1;
+}

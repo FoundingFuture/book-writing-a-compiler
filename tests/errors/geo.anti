@@ -1,0 +1,19 @@
+struct V
+{
+	x: int
+}
+
+export struct S
+{
+	name: str
+}
+
+export fn f(v: *V, s: str) -> c_int
+{
+	return 0;
+}
+
+export fn main() -> int
+{
+	return 0;
+}

@@ -1,0 +1,9 @@
+type main.H = struct { tag: i8, n: i32 }
+fn main.f() -> i64 {
+b0:
+    %0 = copy i64 size_of main.H
+    %1 = mul i64 %0, 1
+    %2 = add i64 %1, 4
+    %3 = sub i64 %2, 4
+    ret i64 %3
+}

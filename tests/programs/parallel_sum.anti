@@ -1,0 +1,50 @@
+/* The worker pool of chapter 22. Each chunk is summed on a worker, and
+   the sums come back in chunk order. */
+
+worker fn total(chunk: []int) -> int
+{
+	let sum = 0;
+	let i = 0;
+	while i < chunk.len do {
+		sum = sum + chunk[i];
+		i = i + 1;
+	}
+	return sum;
+}
+
+worker fn scaled(chunk: []int, factor: int) -> int
+{
+	let sum = 0;
+	let i = 0;
+	while i < chunk.len do {
+		sum = sum + chunk[i] * factor;
+		i = i + 1;
+	}
+	return sum;
+}
+
+fn add_up(parts: []int) -> int
+{
+	let sum = 0;
+	let i = 0;
+	while i < parts.len do {
+		sum = sum + parts[i];
+		i = i + 1;
+	}
+	return sum;
+}
+
+fn main() -> int
+{
+	let numbers = [1, 2, 3, 4, 5, 6, 7, 8];
+	let all = numbers[0..8];
+	let parts = parallel all by 4 -> total;
+	let doubled = parallel all by 2 -> scaled(2);
+
+	if parts.len != 4 {
+		return 1;
+	}
+	/* 36 from the first, 72 from the second, and 36 again with the
+	   chunk count that the machine decides. */
+	return add_up(parts) + add_up(doubled) + add_up(parallel all -> total);
+}

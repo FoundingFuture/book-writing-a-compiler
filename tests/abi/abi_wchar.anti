@@ -1,0 +1,22 @@
+extern fn printf(format: *byte, ...) -> c_int;
+extern fn abi_big_wchar() -> c_wchar;
+extern fn abi_wchar_i64(w: c_wchar) -> i64;
+extern fn abi_wchar_i32(w: c_wchar) -> i32;
+extern fn abi_wchar_less(a: c_wchar, b: c_wchar) -> i32;
+
+fn main() -> int
+{
+	let w = abi_big_wchar();
+	let one: c_wchar = 1;
+	let less = w < one;
+	printf("%lld %lld\n".ptr, w as i64, abi_wchar_i64(w));
+	printf("%d %d\n".ptr, w as i32, abi_wchar_i32(w));
+	printf("%d %d\n".ptr, less as i32, abi_wchar_less(w, one));
+	if w as i64 != abi_wchar_i64(w) || w as i32 != abi_wchar_i32(w) {
+		return 1;
+	}
+	if less as i32 != abi_wchar_less(w, one) {
+		return 2;
+	}
+	return 0;
+}

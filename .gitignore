@@ -1,0 +1,11 @@
+build/
+build-*/
+.DS_Store
+*.o
+*.obj
+*.s
+*.antl
+compile_commands.json
+.cache/
+!tests/dump/*.s
+!writing-a-compiler/*/direct-path/*.s

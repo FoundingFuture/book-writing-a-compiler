@@ -1,0 +1,16 @@
+extern fn putchar(c: i32) -> i32;
+
+fn helper() -> int
+{
+	return 1;
+}
+
+fn used() -> int
+{
+	return 2;
+}
+
+fn main() -> int
+{
+	return used();
+}
