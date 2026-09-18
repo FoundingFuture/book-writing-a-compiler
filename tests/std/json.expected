@@ -1,0 +1,9 @@
+exit 0
+{"type":"Point","x":3,"y":-4}
+{"type":"Named","name":"a\"b\nc","mark":7,"sharp":true}
+null
+-4
+{"x":1}
+"one, two"
+a"b
+c

@@ -1,0 +1,13 @@
+//! The licence notice of the program.
+//!
+//! antic links the notice `anti_licenses` into every executable and shared
+//! library. It names each package of the program with its version and
+//! licence, and holds each licence text once.
+
+extern fn anti_rt_license_text() -> str;
+
+/// The lines of the licence notice between its begin and end markers.
+pub fn text() -> str
+{
+	return anti_rt_license_text();
+}

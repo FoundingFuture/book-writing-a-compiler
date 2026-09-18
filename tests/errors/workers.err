@@ -1,0 +1,3 @@
+workers.anti:14:2: error: `score` is `mutable` in singleton `Board` and `worker fn tally` reaches it
+workers.anti:14:22: error: `score` is `mutable` in singleton `Board` and `worker fn tally` reaches it
+workers.anti:21:2: error: `tally` is a `worker fn` and cannot `delete` an object another one may hold

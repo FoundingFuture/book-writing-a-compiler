@@ -1,0 +1,99 @@
+structs.call:
+b0:
+    stp x29, x30, [sp, #-16]!
+    .seh_save_fplr_x 16
+    sub sp, sp, #64
+    .seh_stackalloc 64
+    str x19, [sp, #56]
+    .seh_save_reg x19, 56
+    str x20, [sp, #48]
+    .seh_save_reg x20, 48
+    str x21, [sp, #40]
+    .seh_save_reg x21, 40
+    str x22, [sp, #32]
+    .seh_save_reg x22, 32
+    str x23, [sp, #24]
+    .seh_save_reg x23, 24
+    str x24, [sp, #16]
+    .seh_save_reg x24, 16
+    str x25, [sp, #8]
+    .seh_save_reg x25, 8
+    add x29, sp, #64
+    .seh_add_fp 64
+    .seh_endprologue
+    sub sp, sp, #128
+    add x19, sp, #0
+    str x0, [x19]
+    str x1, [x19, #8]
+    mov x20, x2
+    add x21, sp, #16
+    strh w3, [x21]
+    lsr x9, x3, #16
+    strb w9, [x21, #2]
+    add x22, sp, #24
+    str s0, [x22]
+    str s1, [x22, #4]
+    add x23, sp, #32
+    add x24, sp, #56
+    ldr x0, [x19]
+    add x25, sp, #72
+    mov x8, x25
+    bl make
+    ldr x9, [x25]
+    str x9, [x23]
+    ldr x9, [x25, #8]
+    str x9, [x23, #8]
+    ldr x9, [x25, #16]
+    str x9, [x23, #16]
+    add x2, sp, #96
+    ldr x9, [x23]
+    str x9, [x2]
+    ldr x9, [x23, #8]
+    str x9, [x2, #8]
+    ldr x9, [x23, #16]
+    str x9, [x2, #16]
+    ldr x0, [x19]
+    ldr x1, [x19, #8]
+    ldrh w3, [x21]
+    ldrb w9, [x21, #2]
+    lsl x9, x9, #16
+    orr x3, x3, x9
+    ldr s0, [x22]
+    ldr s1, [x22, #4]
+    bl take
+    add x9, sp, #120
+    str x0, [x9]
+    str x1, [x9, #8]
+    ldr x10, [x9]
+    str x10, [x24]
+    ldr x9, [x9, #8]
+    str x9, [x24, #8]
+    ldr x9, [x24]
+    ldr x10, [x20, #16]
+    add x9, x9, x10
+    str x9, [x24]
+    ldr x0, [x24]
+    ldr x1, [x24, #8]
+    .seh_startepilogue
+    add sp, sp, #128
+    .seh_stackalloc 128
+    ldr x19, [sp, #56]
+    .seh_save_reg x19, 56
+    ldr x20, [sp, #48]
+    .seh_save_reg x20, 48
+    ldr x21, [sp, #40]
+    .seh_save_reg x21, 40
+    ldr x22, [sp, #32]
+    .seh_save_reg x22, 32
+    ldr x23, [sp, #24]
+    .seh_save_reg x23, 24
+    ldr x24, [sp, #16]
+    .seh_save_reg x24, 16
+    ldr x25, [sp, #8]
+    .seh_save_reg x25, 8
+    add sp, sp, #64
+    .seh_stackalloc 64
+    ldp x29, x30, [sp], #16
+    .seh_save_fplr_x 16
+    .seh_endepilogue
+    ret

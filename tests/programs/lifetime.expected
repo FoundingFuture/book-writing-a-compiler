@@ -1,0 +1,9 @@
+exit 0
+7 1 1
+destruct Leaf 7
+destruct Node 7
+destruct Leaf 7
+destruct Node 7
+block 3
+destruct Node 3
+destruct Node 4

@@ -1,0 +1,23 @@
+// A frame of more than a page with callee-saved integer and float
+// registers and two returns, for the Windows unwind data of chapter 16.
+extern fn g(x: int) -> int;
+extern fn h(x: f64) -> f64;
+
+fn spin(a: int, b: int, c: int) -> int
+{
+	let big: [5000]byte = [0; 5000];
+	let x = g(a) + b;
+	if x < 0 {
+		return c;
+	}
+	let y = g(x) + c;
+	let d = h(a as f64) + (b as f64);
+	let e = h(d) + d;
+	big[a & 1023] = y as byte;
+	return x + y + (e as int) + (big[b & 1023] as int);
+}
+
+fn main() -> int
+{
+	return spin(1, 2, 3);
+}

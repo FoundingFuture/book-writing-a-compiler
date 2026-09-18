@@ -1,0 +1,57 @@
+floatcalls.calls:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    subq $112, %rsp
+    .seh_stackalloc 112
+    movups %xmm6, 96(%rsp)
+    .seh_savexmm %xmm6, 96
+    movups %xmm7, 80(%rsp)
+    .seh_savexmm %xmm7, 80
+    .seh_endprologue
+    movsd %xmm1, %xmm6
+    movsd %xmm6, %xmm1
+    movq %xmm1, %rdx
+    movq $3, %r8
+    call printf
+    movq $1, %rcx
+    movsd %xmm6, %xmm1
+    movq $2, %r8
+    movl $1056964608, %eax
+    movd %eax, %xmm3
+    call mix
+    movsd %xmm0, %xmm7
+    movsd %xmm6, 32(%rsp)
+    movsd %xmm6, 40(%rsp)
+    movsd %xmm6, 48(%rsp)
+    movsd %xmm6, 56(%rsp)
+    movl $1065353216, %eax
+    movd %eax, %xmm0
+    movss %xmm0, 64(%rsp)
+    movl $1073741824, %eax
+    movd %eax, %xmm0
+    movss %xmm0, 72(%rsp)
+    movsd %xmm6, %xmm0
+    movsd %xmm6, %xmm1
+    movsd %xmm6, %xmm2
+    movsd %xmm6, %xmm3
+    call nine
+    cvtss2sd %xmm0, %xmm0
+    movsd %xmm7, %xmm1
+    addsd %xmm0, %xmm1
+    movsd %xmm1, %xmm0
+    movups 96(%rsp), %xmm6
+    movups 80(%rsp), %xmm7
+    addq $112, %rsp
+    popq %rbp
+    ret
+floatcalls.last:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    .seh_endprologue
+    movss 88(%rbp), %xmm0
+    popq %rbp
+    ret

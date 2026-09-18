@@ -1,0 +1,13 @@
+//! A module with one public item and one internal item.
+
+/// Public everywhere.
+pub fn open() -> int
+{
+	return 1 + tuning();
+}
+
+/// Reaches the modules of this package alone.
+internal fn tuning() -> int
+{
+	return 41;
+}

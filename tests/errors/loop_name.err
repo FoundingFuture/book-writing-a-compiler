@@ -1,0 +1,1 @@
+loop_name.anti:5:2: error: a `for` over a slice names its element

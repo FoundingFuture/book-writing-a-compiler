@@ -1,0 +1,42 @@
+//! `defer` runs its statement at every exit of the enclosing block, in
+//! reverse order of declaration. A return, a break and a continue each
+//! leave through the statements they pass.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+fn note(n: int)
+{
+	printf("%d ".ptr, n as c_int);
+}
+
+fn scopes(early: bool) -> int
+{
+	defer note(1);
+	defer note(2);
+	if early {
+		return 10;
+	}
+	{
+		defer note(3);
+		note(4);
+	}
+	return 20;
+}
+
+fn main() -> int
+{
+	printf("%d\n".ptr, scopes(true) as c_int);
+	printf("%d\n".ptr, scopes(false) as c_int);
+	for i in 0..4 {
+		defer note(i * 10);
+		if i == 1 {
+			continue;
+		}
+		if i == 3 {
+			break;
+		}
+		note(i);
+	}
+	printf("\n".ptr);
+	return 0;
+}

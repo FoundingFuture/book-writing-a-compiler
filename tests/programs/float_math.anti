@@ -1,0 +1,61 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+fn show(x: f64)
+{
+	let format = alloc(byte, 7);
+	format[0] = 37;
+	format[1] = 46;
+	format[2] = 49;
+	format[3] = 55;
+	format[4] = 103;
+	format[5] = 10;
+	format[6] = 0;
+	printf(format, x);
+	free(format);
+}
+
+fn divide(a: f64, b: f64) -> f64
+{
+	return a / b;
+}
+
+fn hypot2(a: f64, b: f32) -> f64
+{
+	return a * a + (b * b) as f64;
+}
+
+fn main() -> int
+{
+	let n = 0;
+	let x: f32 = 1.1;
+	let y = x as f64 * 3.0;
+	show(y);
+	show(hypot2(3.0, 4.0));
+	show(-y / 7.0);
+	let big: u64 = 18446744073709551615;
+	show(big as f64);
+	let huge = divide(9300000000000000000.0, 1.0);
+	show((huge as u64) as f64);
+	show((divide(-7.5, 1.0) as i32) as f64);
+	show((x - 0.25) as f64);
+	let nan = divide(0.0, 0.0);
+	if nan != nan {
+		n += 1;
+	}
+	if !(nan < 1.0) {
+		n += 2;
+	}
+	if !(nan >= 1.0) {
+		n += 4;
+	}
+	if !(nan == nan) {
+		n += 8;
+	}
+	if y > 3.0 {
+		n += 16;
+	}
+	if -y <= -3.0 {
+		n += 32;
+	}
+	return n;
+}

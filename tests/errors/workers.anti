@@ -1,0 +1,31 @@
+singleton class Board
+{
+	mutable score: int = 0,
+	atomic hits: int = 0,
+}
+
+class Cell
+{
+	pub n: int = 0,
+}
+
+worker fn tally(part: []int) -> int
+{
+	Board.get().score = Board.get().score + part.len;
+	return helper();
+}
+
+fn helper() -> int
+{
+	let c = alloc Cell { n: 1 };
+	delete(c);
+	return 0;
+}
+
+fn main() -> int
+{
+	let room = alloc([2]int, 1);
+	let all = (*room)[0..2];
+	let sums = parallel all by 2 -> tally;
+	return sums[0];
+}

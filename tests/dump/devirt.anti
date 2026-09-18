@@ -1,0 +1,44 @@
+//! A call on a class pointer reads the entry of a table, because the
+//! object may be of a class below the static type. A `final class` and
+//! a `final fn` have no class below them, so both call directly. The
+//! two modes give the same three calls, because a call is never made
+//! direct by a scan of the classes one module can see.
+
+final class Only
+{
+	n: int = 1,
+
+	pub fn value(self) -> int
+	{
+		return self.n;
+	}
+}
+
+class Base
+{
+	n: int = 2,
+
+	pub fn value(self) -> int
+	{
+		return self.n;
+	}
+
+	pub final fn same(self) -> int
+	{
+		return 7;
+	}
+}
+
+class Derived
+{
+	inherits Base,
+	concrete fn value(self) -> int
+	{
+		return 100;
+	}
+}
+
+pub fn total(p: *Only, q: *Base) -> int
+{
+	return p.value() + q.value() + q.same();
+}

@@ -1,0 +1,77 @@
+//! A call on a class reached through a pointer goes through the table of
+//! the object, so the concrete class decides which body runs. A call on a
+//! value knows its class and goes direct. An abstract class has no value
+//! of its own and appears only behind a pointer.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+abstract class Shape
+{
+	abstract fn area(self) -> int;
+
+	pub fn twice(self) -> int
+	{
+		return 2 * self.area();
+	}
+}
+
+class Square
+{
+	inherits Shape,
+	pub side: int = 0,
+
+	concrete fn area(self) -> int
+	{
+		return self.side * self.side;
+	}
+}
+
+class Box
+{
+	inherits Shape,
+	pub w: int = 0,
+	pub h: int = 0,
+
+	concrete fn area(self) -> int
+	{
+		return self.w * self.h;
+	}
+
+	concrete fn twice(self) -> int
+	{
+		return 100 + self.area();
+	}
+}
+
+fn total(shapes: []*Shape) -> int
+{
+	let sum = 0;
+	for i in 0..shapes.len {
+		sum += shapes[i].area();
+	}
+	return sum;
+}
+
+fn doubled(shapes: []*Shape) -> int
+{
+	let sum = 0;
+	for i in 0..shapes.len {
+		sum += shapes[i].twice();
+	}
+	return sum;
+}
+
+fn main() -> int
+{
+	let s = Square { side: 3 };
+	let b = Box { w: 2, h: 5 };
+	let list: [2]*Shape = [&s, &b];
+	let heap = alloc Square { side: 4 };
+
+	printf("%d %d\n".ptr, total(list[0..2]) as c_int,
+		doubled(list[0..2]) as c_int);
+	printf("%d %d\n".ptr, s.twice() as c_int, b.twice() as c_int);
+	printf("%d %d\n".ptr, heap.area() as c_int, heap.twice() as c_int);
+	free(heap);
+	return 0;
+}

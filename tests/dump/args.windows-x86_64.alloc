@@ -1,0 +1,45 @@
+args.eight:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    .seh_endprologue
+    movq 72(%rbp), %rax
+    addq %rax, %rcx
+    movq %rcx, %rax
+    popq %rbp
+    ret
+args.main:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    subq $80, %rsp
+    .seh_stackalloc 80
+    movq %rbx, 72(%rsp)
+    .seh_savereg %rbx, 72
+    .seh_endprologue
+    movq $4, %rcx
+    call malloc
+    movq %rax, %rbx
+    movb $37, (%rbx)
+    movb $100, 1(%rbx)
+    movb $10, 2(%rbx)
+    movb $0, 3(%rbx)
+    movq $5, 32(%rsp)
+    movq $6, 40(%rsp)
+    movq $7, 48(%rsp)
+    movq $8, 56(%rsp)
+    movq $1, %rcx
+    movq $2, %rdx
+    movq $3, %r8
+    movq $4, %r9
+    call args.eight
+    movq %rbx, %rcx
+    movq %rax, %rdx
+    call printf
+    movq $0, %rax
+    movq 72(%rsp), %rbx
+    addq $80, %rsp
+    popq %rbp
+    ret

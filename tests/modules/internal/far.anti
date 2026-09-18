@@ -1,0 +1,7 @@
+//! A module of another package, which does not.
+import com.example.core;
+
+fn main() -> int
+{
+	return core.open() + core.tuning();
+}

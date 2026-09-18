@@ -1,0 +1,44 @@
+//! `let f = c.area;` is a bound function, a value of the object and the
+//! entry of its table. Calling it needs no receiver, and the entry is the
+//! one the concrete class filled, so a class below the static type still
+//! decides which body runs.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Shape
+{
+	pub size: int = 2,
+
+	pub fn area(self) -> int
+	{
+		return self.size * self.size;
+	}
+
+	pub fn grow(self, by: int) -> int
+	{
+		return self.size + by;
+	}
+}
+
+class Big
+{
+	inherits Shape,
+	concrete fn area(self) -> int
+	{
+		return 100 * self.size;
+	}
+}
+
+fn main() -> int
+{
+	let s = Shape { size: 3 };
+	let b = Big { size: 4 };
+	let f = s.area;
+	let g = b.area;
+	let h = s.grow;
+
+	printf("%d %d %d\n".ptr, f() as c_int, g() as c_int, h(5) as c_int);
+	s.size = 6;
+	printf("%d %d\n".ptr, f() as c_int, h(1) as c_int);
+	return 0;
+}

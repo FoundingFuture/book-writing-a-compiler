@@ -1,0 +1,418 @@
+01-parts-of-a-compiler|code|1|writing-a-compiler/01-parts-of-a-compiler/start.c|The C entry point of every Anti program
+02-the-anti-language|anti|31|tests/programs/object_model.anti|import antiio
+03-setup-and-first-executable|code|1|tools/get-llvm.cmake|The archive holds every LLVM tool Unpac
+03-setup-and-first-executable|code|2|CMakeLists.txt|The host target name in the form of the
+03-setup-and-first-executable|code|3|CMakeLists.txt|anti_rt for the host laid out as the ru
+03-setup-and-first-executable|code|4|writing-a-compiler/03-setup-and-first-executable/direct-path/direct.c|bool direct_parseconst char source size_
+03-setup-and-first-executable|code|5|writing-a-compiler/03-setup-and-first-executable/direct-path/emit_direct.c|Load a 64bit value into x0 An ARM64 ins
+03-setup-and-first-executable|code|6|writing-a-compiler/03-setup-and-first-executable/direct-path/target.c|DESIGN modulename on ELF and MachO as d
+03-setup-and-first-executable|code|7|writing-a-compiler/01-parts-of-a-compiler/start.c|The C entry point of every Anti program
+03-setup-and-first-executable|code|8|src/process.c|DESIGN Windows takes one command line w
+03-setup-and-first-executable|code|9|writing-a-compiler/03-setup-and-first-executable/direct-path/driver.c|static bool link_macos_arm64const char o
+04-lexer|code|1|src/lexer.h|Bytes that belong to a token the decode
+04-lexer|code|2|src/lexer.h|Split source into tokens ending with TO
+04-lexer|code|3|src/lexer.c|Return the length of the valid UTF8 seq
+04-lexer|code|4|src/lexer.c|Skip whitespace and ordinary comments B
+04-lexer|code|5|src/lexer.c|Skip to the end of a block comment that
+04-lexer|code|6|src/lexer.c|The doc marker of the comment that star
+04-lexer|code|7|src/lexer.c|DESIGN consecutive lines with one marke
+04-lexer|code|8|src/lexer.c|DESIGN a block doc of one line holds it
+04-lexer|code|9|src/lexer.c|Push a doc token whose text is raw line
+04-lexer|code|10|src/lexer.c|static const struct kind_info kindsTOKEN
+04-lexer|code|11|src/lexer.c|TOKEN_UINT_TYPE  uint CAT_KEYWORD
+04-lexer|code|12|src/lexer.c|The kind of the word of n bytes at s a
+04-lexer|code|13|src/lexer.c|static bool symbolstruct lexer lx size_t
+04-lexer|code|14|src/lexer.c|Read digits in the given base with _ on
+04-lexer|code|15|src/lexer.c|Decode one escape at the current  Store
+04-lexer|code|16|src/lexer.c|A prefix of r b or br starts a string l
+04-lexer|code|17|src/lexer.c|A string literal an optional r b or br
+04-lexer|code|18|src/lexer.c|bool lexconst char source size_t length
+04-lexer|code|19|writing-a-compiler/04-lexer/direct-path/direct.c|bool direct_parse_tokensconst char sourc
+05-parser-and-syntax-tree|code|1|src/parser.h|Build the syntax tree of one module fro
+05-parser-and-syntax-tree|code|2|src/ast.h|struct expr
+05-parser-and-syntax-tree|code|3|src/ast.h|struct item
+05-parser-and-syntax-tree|code|4|src/ast.h|The text of the doc comments before a n
+05-parser-and-syntax-tree|code|5|src/ast.h|struct import
+05-parser-and-syntax-tree|code|6|src/parser.c|case TOKEN_WHILE
+05-parser-and-syntax-tree|code|7|src/parser.c|static bool expectstruct parser p enum t
+05-parser-and-syntax-tree|code|8|src/parser.c|The precedence of a binary operator fro
+05-parser-and-syntax-tree|code|9|src/parser.c|Precedence climbing parse operands and
+05-parser-and-syntax-tree|code|10|src/parser.c|unary  as type  as binds tighter than t
+05-parser-and-syntax-tree|code|11|src/parser.c|A condition may not hold a struct or sl
+05-parser-and-syntax-tree|code|12|src/parser.c|static struct block blockstruct parser p
+05-parser-and-syntax-tree|code|13|src/parser.c|DESIGN the arms of a switch are separat
+05-parser-and-syntax-tree|code|14|src/parser.c|case TOKEN_FOR
+05-parser-and-syntax-tree|code|15|src/parser.c|static struct item itemstruct parser p
+05-parser-and-syntax-tree|code|16|src/parser.c|static bool is_builtin_typeenum token_ki
+05-parser-and-syntax-tree|code|17|src/parser.c|Whether token t is the identifier word
+05-parser-and-syntax-tree|code|18|src/parser.c|A module path identifiers joined by dot
+05-parser-and-syntax-tree|code|19|src/parser.c|struct parser
+05-parser-and-syntax-tree|code|20|src/parser.c|The text of the doc comments of one kin
+05-parser-and-syntax-tree|code|21|src/parser.c|bool parseconst char source const struct
+05-parser-and-syntax-tree|code|22|src/parser.c|static void error_herestruct parser p co
+05-parser-and-syntax-tree|code|23|src/parser.c|Skip to the start of the next statement
+05-parser-and-syntax-tree|code|24|src/parser.c|Skip to the next item at the outermost
+05-parser-and-syntax-tree|code|25|src/parser.c|After an error in an import skip the re
+05-parser-and-syntax-tree|code|26|writing-a-compiler/05-parser-and-syntax-tree/direct-path/direct.c|bool direct_checkconst struct module mod
+06-semantic-analysis|code|1|src/sema.h|Check one module against the rules of c
+06-semantic-analysis|code|2|src/types.h|struct type
+06-semantic-analysis|code|3|src/types.c|DESIGN derived types sit in one linked
+06-semantic-analysis|code|4|src/sema.c|static struct type builtin_of_tokenstruc
+06-semantic-analysis|code|5|src/types.c|int type_bitsconst struct type t
+06-semantic-analysis|code|6|src/sema.h|struct symbol
+06-semantic-analysis|code|7|src/sema.c|Declare a symbol in the current scope A
+06-semantic-analysis|code|8|src/sema.c|An integer literal with negative set fo
+06-semantic-analysis|code|9|src/sema.c|Check both operands of a binary operato
+06-semantic-analysis|code|10|src/sema.c|The conversion table of chapter 2
+06-semantic-analysis|code|11|src/sema.c|An expression that denotes a location i
+06-semantic-analysis|code|12|src/sema.c|Whether e reads a bitfield which has no
+06-semantic-analysis|code|13|src/sema.c|Rewrite vfargs into freceiver args The
+06-semantic-analysis|code|14|src/sema.c|s  struct_ofbase
+06-semantic-analysis|code|15|src/sema.h|enum const_kind
+06-semantic-analysis|code|16|src/sema.c|DESIGN a constant of a targetsized type
+06-semantic-analysis|code|17|src/sema.c|Report a constant of a targetsized type
+06-semantic-analysis|code|18|src/sema.c|Give a constant symbol its type and val
+06-semantic-analysis|code|19|src/sema.c|DESIGN C leaves these operations undefi
+06-semantic-analysis|code|20|src/types.h|enum symbolic_kind
+06-semantic-analysis|code|21|src/types.c|const struct symbolic types_symbolicstru
+06-semantic-analysis|code|22|src/sema.c|case EXPR_SIZE_OF
+06-semantic-analysis|code|23|src/sema.c|A constant as a symbolic node a symboli
+06-semantic-analysis|code|24|src/sema.c|A constant expression of type int with
+06-semantic-analysis|code|25|src/types.h|struct struct_field
+06-semantic-analysis|code|26|src/sema.c|struct item it  moduleitemsi
+06-semantic-analysis|code|27|src/sema.c|The width of a bitfield a constant from
+06-semantic-analysis|code|28|src/sema.c|The N of alignN a constant power of two
+06-semantic-analysis|code|29|src/types.h|DESIGN the front end computes no layout
+06-semantic-analysis|code|30|src/types.c|static struct type cycle_instruct type t
+06-semantic-analysis|code|31|src/sema.c|The missingreturn rule of chapter 2 dec
+06-semantic-analysis|code|32|src/sema.c|Every value of an enum needs an arm whe
+06-semantic-analysis|code|33|src/sema.c|Whether a value of type t has a C repre
+06-semantic-analysis|code|34|src/sema.c|Report a type in an export signature or
+06-semantic-analysis|code|35|src/sema.c|DESIGN an export item has a C symbol an
+06-semantic-analysis|code|36|src/diagnostic.h|A compile error or warning at a positio
+06-semantic-analysis|code|37|src/sema.c|DESIGN doc warnings belong to anti chec
+06-semantic-analysis|code|38|src/driver.c|if sema_checktree text_cstrmodule op
+06-semantic-analysis|code|39|src/driver.c|static void print_diagnosticsconst char
+06-semantic-analysis|code|40|src/types.c|bool type_pointer_freeconst struct type
+07-intermediate-representation|code|1|src/ir.h|Scalar value types bool is i8 char is i
+07-intermediate-representation|code|2|src/ir.h|The intermediate representation of anti
+07-intermediate-representation|code|3|src/ir.h|define IR_NO_AGG UINT32_MAX
+07-intermediate-representation|code|4|src/ir_print.c|A struct or union prints as type name
+07-intermediate-representation|code|5|src/ir.h|enum ir_sym_kind
+07-intermediate-representation|code|6|src/ir.c|struct ir_operand ir_sym_operandconst st
+07-intermediate-representation|code|7|src/ir_print.c|void ir_sym_printstruct text out const s
+07-intermediate-representation|code|8|src/ir.h|enum ir_op
+07-intermediate-representation|code|9|src/ir.h|enum ir_operand_kind
+07-intermediate-representation|code|10|src/ir.h|define IR_NO_RESULT UINT32_MAX
+07-intermediate-representation|code|11|src/ir.h|A parameter An aggregate parameters tem
+07-intermediate-representation|code|12|src/ir.h|struct ir_module
+07-intermediate-representation|code|13|tests/unit/test_ir.c|static void loopvoid
+07-intermediate-representation|code|14|tests/unit/test_ir.c|foo  ir_struct_addm IR_AGG_STRUCT ma
+07-intermediate-representation|code|15|src/ir_verify.c|bool ir_verifyconst struct ir_module m s
+08-lowering-to-ir|code|1|src/lower.c|struct lowerer
+08-lowering-to-ir|code|2|src/lower.c|bool is i8 and char is i32 Signedness m
+08-lowering-to-ir|code|3|src/sema.c|static void mark_address_takenstruct exp
+08-lowering-to-ir|code|4|src/lower.c|DESIGN every addresstaken local gets it
+08-lowering-to-ir|code|5|src/lower.c|A local that is not addresstaken gets a
+08-lowering-to-ir|code|6|src/lower.c|static struct ir_operand lower_exprstruc
+08-lowering-to-ir|code|7|src/lower.c|static enum ir_op binary_openum token_ki
+08-lowering-to-ir|code|8|src/lower.c|The narrowest and the widest width of a
+08-lowering-to-ir|code|9|src/lower.c|The conversions of chapter 2 Two types
+08-lowering-to-ir|code|10|src/lower.c|static struct ir_vtype vtype_ofstruct lo
+08-lowering-to-ir|code|11|src/lower.c|static struct ir_operand element_address
+08-lowering-to-ir|code|12|src/lower.c|static struct ir_operand constantstruct
+08-lowering-to-ir|code|13|src/lower.c|The IR form of a symbolic value the ope
+08-lowering-to-ir|code|14|src/lower.c|Chapter 2 evaluates the place first and
+08-lowering-to-ir|code|15|src/lower.c|Branch to then_block when e is true and
+08-lowering-to-ir|code|16|src/lower.c|a  b or a  b as a value The result is a
+08-lowering-to-ir|code|17|src/lower.c|Each condition of the chain branches to
+08-lowering-to-ir|code|18|src/lower.c|static void lower_blockstruct lowerer l
+08-lowering-to-ir|code|19|src/lower.c|static void lower_loopstruct lowerer l c
+08-lowering-to-ir|code|20|src/lower.c|DESIGN for is a loop of its own rather
+08-lowering-to-ir|code|21|src/lower.c|Run the statements of one block scope l
+08-lowering-to-ir|code|22|src/lower.c|Run every scope from the innermost out
+08-lowering-to-ir|code|23|src/lower.c|static struct ir_operand lower_callstruc
+08-lowering-to-ir|code|24|src/lower.c|static void lower_functionstruct lowerer
+09-modules-and-library-files|code|1|src/modpath.c|bool module_path_of_sourceconst char sou
+09-modules-and-library-files|code|2|src/driver.c|The module path of the input from its p
+09-modules-and-library-files|code|3|src/driver.c|The library files of the compilation Th
+09-modules-and-library-files|code|4|src/sema.h|What other modules see of a module its
+09-modules-and-library-files|code|5|src/sema.c|An import declares the last segment of
+09-modules-and-library-files|code|6|src/sema.c|Rewrite modulename into a plain name of
+09-modules-and-library-files|code|7|src/sema.c|DESIGN vfargs resolves in the namespace
+09-modules-and-library-files|code|8|src/ir.h|A function of another Anti module which
+09-modules-and-library-files|code|9|src/lower.c|The IR function of a function symbol An
+09-modules-and-library-files|code|10|src/target.c|DESIGN modulename on ELF and MachO as d
+09-modules-and-library-files|code|11|src/sema.h|The package header of a library file an
+09-modules-and-library-files|code|12|src/antl.c|The magic the version the package heade
+09-modules-and-library-files|code|13|src/antl.c|DESIGN the file is a flat sequence of l
+09-modules-and-library-files|code|14|src/antl.c|A count of records that each take at le
+09-modules-and-library-files|code|15|src/antl.c|struct interface antl_readconst uint8_t
+09-modules-and-library-files|code|16|src/antl.c|The programs index of aggregate agg of
+10-optimizer|code|1|src/optimize.h|void ir_optimizestruct ir_module program
+10-optimizer|code|2|src/optimize.c|void ir_optimizestruct ir_module program
+10-optimizer|code|3|src/optimize.c|void ir_optimize_functionstruct ir_funct
+10-optimizer|code|4|src/optimize.c|DESIGN the passes rely on three propert
+10-optimizer|code|5|src/ir_verify.c|The temporaries defined on every path i
+10-optimizer|code|6|src/optimize.c|static bool fold_intenum ir_op op enum i
+10-optimizer|code|7|src/optimize.c|static bool is_constantconst struct ir_o
+10-optimizer|code|8|src/optimize.c|static bool is_target_sizedenum ir_type
+10-optimizer|code|9|src/optimize.c|Inside one block a use after x  copy v
+10-optimizer|code|10|src/optimize.c|Across blocks x  copy v replaces every
+10-optimizer|code|11|src/optimize.c|Rewrite inst into a simpler instruction
+10-optimizer|code|12|src/optimize.c|The block that a jump to b reaches afte
+10-optimizer|code|13|src/optimize.c|static bool remove_unused_resultsstruct
+10-optimizer|code|14|src/optimize.c|The address an operand names as a base
+10-optimizer|code|15|src/optimize.c|static bool same_addressconst struct add
+10-optimizer|code|16|src/optimize.c|static bool forward_storesstruct ir_func
+10-optimizer|code|17|src/optimize.c|DESIGN whether inst lets the address in
+10-optimizer|anti|8|tests/dump/devirt.anti|pub fn totalp Only q Base  int
+10-optimizer|code|18|src/optimize.c|Remove the functions and globals that t
+10-optimizer|code|19|src/optimize.c|void ir_optimize_modulestruct ir_module
+10-optimizer|code|20|tests/unit/test_optimize.c|ir_optimize_modulem main
+10-optimizer|code|21|tests/CMakeLists.txt|fileGLOB opt_sources CONFIGURE_DEPENDS C
+11-targets-and-abis|code|1|src/target.h|What the rest of antic needs to know ab
+11-targets-and-abis|code|2|src/target.c|DESIGN one row per target in the order
+11-targets-and-abis|code|3|src/layout.c|The scalars of a value of type v at off
+11-targets-and-abis|code|4|src/layout.c|The fixedwidth IR type of c_long or c_w
+11-targets-and-abis|code|5|src/layout.c|Whether wchar_t is signed on the target
+11-targets-and-abis|code|6|rt/start.c|A symbol with a dot is not a C identifi
+12-instruction-selection|code|1|src/select.c|bool select_moduleenum target t struct i
+12-instruction-selection|code|2|src/layout.h|The layout of an aggregate on the targe
+12-instruction-selection|code|3|src/layout.h|Lay out every aggregate of m for target
+12-instruction-selection|code|4|src/layout.c|Give a targetsized type its width on th
+12-instruction-selection|code|5|src/mach.h|struct mach_operand
+12-instruction-selection|code|6|src/mach.h|Operands follow the destinationfirst or
+12-instruction-selection|code|7|src/mach.h|How an opcode treats each register oper
+12-instruction-selection|code|8|src/select.c|static void select_functionstruct select
+12-instruction-selection|code|9|src/select.h|One row of a targets pattern table The
+12-instruction-selection|code|10|src/select.c|static const struct pattern find_pattern
+12-instruction-selection|code|11|src/arm64.c|static const struct pattern patterns
+12-instruction-selection|code|12|src/select.h|The layout of aggregate agg on the targ
+12-instruction-selection|code|13|src/select.c|const struct layout select_layoutconst s
+12-instruction-selection|code|14|src/arm64.c|A negative immediate turns add into sub
+12-instruction-selection|code|15|src/arm64.c|An instruction holds a 16bit immediate
+12-instruction-selection|code|16|src/x86_64.c|r  a op b becomes mov a r and op b r in
+12-instruction-selection|code|17|src/x86_64.c|An immediate of a 64bit instruction is
+12-instruction-selection|code|18|src/select.c|A comparison whose only use is the bran
+12-instruction-selection|code|19|src/select.h|The registers of a calling convention a
+13-register-allocation|code|1|src/regalloc.c|static void compute_livenessstruct alloc
+13-register-allocation|code|2|src/regalloc.c|static void scan_registervoid ctx const
+13-register-allocation|code|3|src/regalloc.c|static int chooseconst struct alloc a st
+13-register-allocation|code|4|src/arm64.c|DESIGN allocation prefers x9 to x15 whi
+13-register-allocation|code|5|src/regalloc.c|DESIGN when no register is free the int
+13-register-allocation|code|6|src/regalloc.c|The physical register of virtual regist
+13-register-allocation|code|7|src/lower.c|Every block records the loops it sits i
+13-register-allocation|code|8|src/regalloc.c|ctxweight  1
+13-register-allocation|code|9|src/regalloc.c|DESIGN a constant never spills Its defi
+13-register-allocation|code|10|src/regalloc.c|Constants are reemitted before live
+13-register-allocation|anti|3|tests/dump/spillweight.anti|pub fn hotn int  int
+13-register-allocation|code|11|src/regalloc.c|static void layout_framestruct alloc a s
+13-register-allocation|code|12|src/arm64.c|The frame record of x29 and x30 sits ab
+13-register-allocation|code|13|src/arm64.c|A slot is an offset from sp that frame
+14-x86-64-back-end|code|1|src/arm64.c|IR_SDIV match_arith emit_div
+14-x86-64-back-end|code|2|src/x86_64.c|static const char const names64
+14-x86-64-back-end|code|3|src/x86_64.c|imul has a threeoperand form with an im
+14-x86-64-back-end|code|4|src/x86_64.c|Division takes the dividend in rdxrax a
+14-x86-64-back-end|code|5|src/x86_64.c|A variable shift count must be in cl
+14-x86-64-back-end|code|6|src/x86_64.c|trunc keeps the low bits with a move of
+14-x86-64-back-end|code|7|src/x86_64.c|static const char const cond_names
+14-x86-64-back-end|code|8|src/select.c|A ptradd whose only use is the load or
+14-x86-64-back-end|code|9|src/x86_64.c|A displacement holds 32 bits and a scal
+14-x86-64-back-end|code|10|src/x86_64.c|Stack arguments go to the area at the b
+14-x86-64-back-end|code|11|src/x86_64.c|A parameter on the stack sits above the
+14-x86-64-back-end|code|12|src/x86_64.c|Windows requires a frame of a page or m
+14-x86-64-back-end|code|13|src/x86_64.c|DESIGN Windows x64 unwinding recognises
+14-x86-64-back-end|code|14|tests/run_asm.cmake|execute_process
+15-arm64-back-end|code|1|src/arm64.c|IR_SDIV match_arith emit_div
+15-arm64-back-end|code|2|src/arm64.c|The instruction that extends an 8bit or
+15-arm64-back-end|code|3|src/arm64.c|cmp compares 32 or 64 bits An 8bit or 1
+15-arm64-back-end|code|4|src/arm64.c|sdiv and udiv divide registers of 32 or
+15-arm64-back-end|code|5|src/arm64.c|lsl asr and lsr shift by a register mod
+15-arm64-back-end|code|6|src/arm64.c|trunc keeps the low bits with a move of
+15-arm64-back-end|code|7|src/arm64.c|add sub cmp and cmn take a 12bit immedi
+15-arm64-back-end|code|8|src/arm64.c|and orr and eor take a logical immediat
+15-arm64-back-end|code|9|src/arm64.c|A load or a store adds an unsigned 12bi
+15-arm64-back-end|code|10|src/arm64.c|A store of zero reads the zero register
+15-arm64-back-end|code|11|src/arm64.c|The address of a function or a global a
+15-arm64-back-end|code|12|src/arm64.c|DESIGN AAPCS64 counts integer and float
+15-arm64-back-end|code|13|src/arm64.c|Stack arguments go to the area at sp th
+15-arm64-back-end|code|14|src/lower.c|static enum ir_ext param_extconst struct
+15-arm64-back-end|code|15|src/arm64.c|A parameter beyond x7 lies in the argum
+15-arm64-back-end|code|16|src/arm64.c|Move sp down by size bytes of the frame
+15-arm64-back-end|code|17|src/arm64.c|ldr and str of 64 bits take an offset f
+15-arm64-back-end|code|18|src/arm64.c|The address of a slot is add dst sp off
+16-assembly-emission|code|1|src/driver.c|Lower and optimize the program and run
+16-assembly-emission|code|2|src/mach.h|How printed machine code names symbols
+16-assembly-emission|code|3|src/target.c|DESIGN a C symbol is the name of the it
+16-assembly-emission|code|4|src/mach.c|void mach_function_symbolstruct text out
+16-assembly-emission|code|5|src/emit.c|static bool emitstruct text out enum tar
+16-assembly-emission|code|6|src/emit.c|The runtime reaches main through a seco
+16-assembly-emission|code|7|src/emit.c|static void emit_functionstruct text out
+16-assembly-emission|code|8|src/arm64.c|else if instop  A64_ADD
+16-assembly-emission|code|9|rt/start.c|A symbol with a dot is not a C identifi
+16-assembly-emission|code|10|src/x86_64.c|rbp points to the saved rbp above the f
+16-assembly-emission|code|11|src/regalloc.c|The bytes from the top of the frame to
+16-assembly-emission|code|12|src/arm64.c|With unwind data the epilogue mirrors t
+16-assembly-emission|code|13|src/arm64.c|Move sp up by bytes Each instruction ge
+16-assembly-emission|code|14|tests/run_dev.cmake|Build a program of three modules in dev
+16-assembly-emission|code|15|rt/start.c|int mainint argc char argv
+16-assembly-emission|code|16|rt/init.c|include rth
+16-assembly-emission|code|17|src/emit.c|DESIGN a shared library initialises the
+16-assembly-emission|code|18|src/notice.h|The begin and end markers of the licenc
+16-assembly-emission|code|19|src/driver.c|The licence notice of a linked binary t
+16-assembly-emission|code|20|src/notice.c|Whether a package before index i has th
+16-assembly-emission|code|21|src/emit.c|void emit_licensesstruct text out enum t
+16-assembly-emission|code|22|tests/run_licenses.cmake|Link a program and find the licence not
+16-assembly-emission|code|23|src/driver.c|if ok  infoos  OS_WINDOWS
+16-assembly-emission|code|24|src/driver.c|Run llvmmc on the assembly file for the
+16-assembly-emission|code|25|src/driver.c|DESIGN lld links for every target from
+16-assembly-emission|code|26|src/driver.c|The facts of a link for the target lld
+16-assembly-emission|code|27|src/linker.c|The program of the linker flavour of ll
+16-assembly-emission|code|28|src/linker.c|static void add_inputsstruct link_comman
+16-assembly-emission|code|29|src/linker.c|The start of a MachO link arch the vers
+16-assembly-emission|code|30|src/linker.c|static void macosstruct link_command c e
+16-assembly-emission|code|31|src/linker.c|DESIGN ldlld links a Linux program stat
+16-assembly-emission|code|32|src/linker.c|GNU ld a positionindependent executable
+16-assembly-emission|code|33|src/linker.c|const char const link_crt_dirsenum targe
+16-assembly-emission|code|34|src/linker.c|The library directories of lldlink the
+16-assembly-emission|code|35|src/linker.c|DESIGN linkexe or lldlink with the C ru
+16-assembly-emission|code|36|src/linker.c|void link_runtime_librarystruct text out
+17-floating-point|code|1|src/mach.c|uint32_t mach_vreg_addstruct mach_functi
+17-floating-point|code|2|src/regalloc.c|The registers that the allocator hands
+17-floating-point|code|3|src/x86_64.c|static const struct abi windows
+17-floating-point|code|4|src/x86_64.c|Windows preserves all 128 bits of xmm6
+17-floating-point|code|5|src/x86_64.c|A float constant has no immediate form
+17-floating-point|code|6|src/x86_64.c|SSE has no negation xorpd flips the sig
+17-floating-point|code|7|src/x86_64.c|ucomisd sets the flags of an unsigned c
+17-floating-point|code|8|src/arm64.c|fcmp sets N for less Z and C for equal
+17-floating-point|code|9|src/arm64.c|scvtf and ucvtf convert a w or x regist
+17-floating-point|code|10|src/x86_64.c|A u64 of 263 or more has no signed conv
+17-floating-point|code|11|src/x86_64.c|A float of 263 or more has no signed co
+17-floating-point|code|12|src/x86_64.c|else if a  windows  position  a
+17-floating-point|code|13|src/arm64.c|for i  0 i  count i
+17-floating-point|code|14|src/arm64.c|if sabi  apple  variadic
+17-floating-point|code|15|src/arm64.c|A move of a w register clears the u
+17-floating-point|code|16|src/x86_64.c|A 32bit move that clears the upper
+18-structs-and-arrays|code|1|src/lower.c|The address of the memory that holds th
+18-structs-and-arrays|code|2|src/lower.c|The aggregate of t in the type table of
+18-structs-and-arrays|code|3|src/lower.c|static struct ir_vtype vtype_ofstruct lo
+18-structs-and-arrays|code|4|src/lower.c|The offset of a field as an operand C p
+18-structs-and-arrays|code|5|src/lower.c|vf is fs offset after the address of v
+18-structs-and-arrays|code|6|src/lower.c|static struct ir_operand element_address
+18-structs-and-arrays|code|7|src/lower.c|The offset of element index of an array
+18-structs-and-arrays|code|8|src/lower.c|if easfieldbasetypekind  TYPE_AR
+18-structs-and-arrays|code|9|src/lower.c|The repeat form of an array literal com
+18-structs-and-arrays|code|10|src/lower.c|Construct the aggregate value of e at d
+18-structs-and-arrays|code|11|src/lower.c|if is_aggregatetargettype
+18-structs-and-arrays|code|12|src/x86_64.c|DESIGN a copy of up to 64 bytes moves 8
+18-structs-and-arrays|code|13|src/arm64.c|static void emit_memcopystruct selector
+18-structs-and-arrays|code|14|src/ir.h|enum ir_const_kind
+18-structs-and-arrays|code|15|src/lower.c|The constant v of type t as the tree th
+18-structs-and-arrays|code|16|src/layout.c|DESIGN the bytes start as zeros and eac
+18-structs-and-arrays|code|17|src/lower.c|The struct field that e reads when it i
+18-structs-and-arrays|code|18|src/lower.c|static struct ir_operand read_placestruc
+18-structs-and-arrays|code|19|src/layout.h|One scalar inside an aggregate for the
+18-structs-and-arrays|code|20|src/layout.c|The fixedwidth IR type of c_long or c_w
+18-structs-and-arrays|code|21|src/layout.c|The C rules of chapter 18 A struct plac
+18-structs-and-arrays|code|22|src/layout.c|The integer a load or store of a bitfie
+18-structs-and-arrays|code|23|src/layout.c|The scalars of a value of type v at off
+18-structs-and-arrays|code|24|src/layout.c|bool layout_foldstruct layouts l uint32_
+18-structs-and-arrays|code|25|src/layout.c|bool layout_resolvestruct layouts l stru
+18-structs-and-arrays|code|26|src/layout.c|DESIGN a bitfield load reads the intege
+18-structs-and-arrays|code|27|src/x86_64.c|The eightbytes of a System V aggregate
+18-structs-and-arrays|code|28|src/x86_64.c|static void locateconst struct selector
+18-structs-and-arrays|code|29|src/x86_64.c|Windows passes an aggregate of 1 2 4 or
+18-structs-and-arrays|code|30|src/arm64.c|A homogeneous floatingpoint aggregate o
+18-structs-and-arrays|code|31|src/arm64.c|The register parts of an aggregate star
+18-structs-and-arrays|code|32|src/arm64.c|DESIGN AAPCS64 counts integer and float
+18-structs-and-arrays|code|33|src/x86_64.c|Load bytes of an aggregate at offset af
+18-structs-and-arrays|code|34|src/select.c|DESIGN a slot for an aggregate that reg
+18-structs-and-arrays|code|35|src/select.c|if typesi  IR_AGG
+18-structs-and-arrays|code|36|src/x86_64.c|static void emit_retstruct selector s co
+18-structs-and-arrays|code|37|tests/unit/test_select.c|static const char aligned  packed struct
+18-structs-and-arrays|code|38|src/x86_64.c|DESIGN clang callees on System
+18-structs-and-arrays|code|39|tests/abi/structs.c|Seven doubles leave one float register
+18-structs-and-arrays|code|40|tests/abi/structs.c|union Num  int64_t i double d
+18-structs-and-arrays|code|41|tests/abi/structs.c|struct __attribute__packed Tight  int8_t
+18-structs-and-arrays|code|42|tests/abi/probe.c|struct Wide
+18-structs-and-arrays|code|43|tests/run_probe.cmake|The ABI probe on the host compile probe
+18-structs-and-arrays|code|44|tests/abi/raymath.c|The raymath functions of raylib as outo
+19-strings-slices-and-bytes|code|1|src/lower.c|A str a slice and a bound function are
+19-strings-slices-and-bytes|code|2|src/lower.c|else
+19-strings-slices-and-bytes|code|3|src/lower.c|The offset of a field as an operand C p
+19-strings-slices-and-bytes|code|4|src/lower.c|The address of element 0 an array start
+19-strings-slices-and-bytes|code|5|src/lower.c|alohi points lo elements after element
+19-strings-slices-and-bytes|code|6|src/lower.c|DESIGN the bytes of a literal and a NUL
+19-strings-slices-and-bytes|code|7|src/emit.c|DESIGN global data holds the bytes of l
+19-strings-slices-and-bytes|code|8|src/emit.c|static void emit_datastruct text out enu
+19-strings-slices-and-bytes|code|9|src/emit.c|DESIGN data that holds an address is wr
+19-strings-slices-and-bytes|code|10|src/emit.c|The symbol an address at offset names w
+19-strings-slices-and-bytes|code|11|rt/start.c|The layouts of Antis str and str
+19-strings-slices-and-bytes|code|12|rt/start.c|extern char environ
+19-strings-slices-and-bytes|code|13|rt/utf.c|DESIGN each maximal subpart of an illfo
+19-strings-slices-and-bytes|code|14|rt/utf.c|DESIGN the rules of the Microsoft C sta
+20-function-pointers|code|1|src/lower.c|static struct ir_operand lower_namestruc
+20-function-pointers|code|2|src/lower.c|DESIGN a call through a function pointe
+20-function-pointers|code|3|src/lower.c|Whether declared function g has the par
+20-function-pointers|code|4|src/lower.c|static struct ir_operand lower_callstruc
+20-function-pointers|code|5|src/ir_verify.c|case IR_CALL
+20-function-pointers|code|6|src/select.c|const struct ir_function select_calleeco
+20-function-pointers|code|7|src/arm64.c|bool indirect  instbkind  IR_FUNC
+20-function-pointers|code|8|src/x86_64.c|call  emit1s indirect  X64_CALLR  X6
+20-function-pointers|code|9|src/ir_print.c|static void param_typestruct text out co
+20-function-pointers|code|10|src/select.c|bool select_uses_gotconst struct selecto
+20-function-pointers|code|11|src/x86_64.c|The address of a function or a global r
+20-function-pointers|code|12|src/arm64.c|else if instop  A64_LDRGOT  i
+21-testing-six-targets|code|1|tests/run_program.cmake|fileREAD expected_file expected
+21-testing-six-targets|code|2|tests/run_line_endings.cmake|fileGLOB_RECURSE files ROOTtestsprograms
+21-testing-six-targets|code|3|tests/CMakeLists.txt|fileSTRINGS CMAKE_CURRENT_SOURCE_DIRchap
+22-threads|code|1|src/sema.c|DESIGN the safety of parallel rests on
+22-threads|code|2|src/sema.c|if fnkind  TYPE_FN  sym  NULL  symwo
+22-threads|code|3|src/lower.c|DESIGN the worker pool calls one C sign
+22-threads|code|4|src/lower.c|DESIGN parallel a by n  fx becomes one
+22-threads|code|5|rt/threads.c|The first element and the length of chu
+22-threads|code|6|rt/threads.c|if defined_WIN32
+22-threads|code|7|rt/threads.c|start
+22-threads|code|8|rt/threads.c|DESIGN the count comes from the machine
+22-threads|anti|2|tests/programs/dispatch_job.anti|class Counter
+23-libraries-for-c|code|1|src/main.c|else if strcmparg lib  0
+23-libraries-for-c|code|2|src/driver.c|if olib  LIB_NONE  oassembly_only
+23-libraries-for-c|code|3|src/driver.c|if olib  LIB_NONE  defines_maintree
+23-libraries-for-c|code|4|src/driver.c|The interface of the compiled module wi
+23-libraries-for-c|code|5|src/driver.c|The licence notice of a linked binary t
+23-libraries-for-c|code|6|tests/dump/geo.h|geoh the C interface of comexamplegeo w
+23-libraries-for-c|code|7|src/header.c|The C name of a scalar type DESIGN a si
+23-libraries-for-c|code|8|src/header.c|Append the C declaration of name with t
+23-libraries-for-c|code|9|src/header.c|DESIGN an export struct or union become
+23-libraries-for-c|code|10|tests/dump/shapes.h|Five bytes without padding
+23-libraries-for-c|code|11|src/header.c|static void constantstruct text out cons
+23-libraries-for-c|code|12|src/header.c|DESIGN the header keeps the Anti name o
+23-libraries-for-c|code|13|src/header.c|A prototype names its parameters as the
+23-libraries-for-c|code|14|src/header.c|void header_writestruct text out const c
+23-libraries-for-c|code|15|src/driver.c|Write a library for C from object its h
+23-libraries-for-c|code|16|src/linker.c|void archive_commandstruct link_command
+23-libraries-for-c|code|17|src/linker.c|void link_linestruct text out enum targe
+23-libraries-for-c|code|18|src/driver.c|Assemble the object of the package head
+23-libraries-for-c|code|19|src/emit.c|DESIGN the copy of the package header i
+23-libraries-for-c|code|20|src/driver.c|The members of a static library besides
+23-libraries-for-c|code|21|src/linker.c|DESIGN ld64 turns hidden symbols into l
+23-libraries-for-c|code|22|tests/dump/geo.bundle.h|geoh the C interface of comexamplegeo w
+23-libraries-for-c|code|23|src/driver.c|if ok  olib  LIB_SHARED
+23-libraries-for-c|code|24|src/linker.c|void link_shared_commandstruct link_comm
+23-libraries-for-c|code|25|rt/rt.h|ifndef ANTI_RT_H
+23-libraries-for-c|code|26|rt/init.c|include rth
+23-libraries-for-c|anti|5|tests/clib/com/example/canvas.anti|What a shape can be drawn with
+23-libraries-for-c|code|27|tests/dump/canvas.h|The root of every class chain and the r
+23-libraries-for-c|code|28|tests/dump/canvas.h|typedef struct Shape_vtable
+23-libraries-for-c|code|29|tests/dump/canvas.h|struct Shape
+23-libraries-for-c|code|30|tests/dump/canvas.h|struct Square
+23-libraries-for-c|code|31|tests/dump/canvas.h|extern const anti_descriptor anti_Square
+23-libraries-for-c|code|32|tests/dump/canvas.h|extern const Ink_vtable anti_Square_Ink_
+23-libraries-for-c|code|33|tests/dump/canvas.h|int32_t Square_areaSquare self
+23-libraries-for-c|code|34|tests/dump/canvas.h|static inline int32_t anti_Shape_areaSha
+23-libraries-for-c|code|35|tests/clib/canvas.c|A C program that builds Anti classes ca
+23-libraries-for-c|anti|6|tests/programs/wrap_c.anti|extern fn fopenpath byte mode byte  byte
+23-libraries-for-c|code|36|tests/clib/roundtrip.c|A C program that calls every export fn
+24-classes|code|1|rt/object.c|struct anti_text anti_rt_Object_type_nam
+24-classes|code|2|rt/object.c|void anti_rt_destroyvoid object

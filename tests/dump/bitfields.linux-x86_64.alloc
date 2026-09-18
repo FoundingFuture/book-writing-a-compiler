@@ -1,0 +1,51 @@
+bitfields.main:
+b0:
+    movb %al, %dl
+    andb $-2, %dl
+    orb $1, %dl
+    andb $-31, %dl
+    orb $18, %dl
+    andb $31, %dl
+    orb $-96, %dl
+    movw %cx, %si
+    andw $-512, %si
+    movw %si, %cx
+    orw $300, %cx
+    movb %dl, %sil
+    shrb $1, %sil
+    andb $15, %sil
+    movzbl %sil, %esi
+    addl $3, %esi
+    andb $15, %sil
+    shlb $1, %sil
+    andb $-31, %dl
+    orb %sil, %dl
+    movb %dl, %sil
+    sarb $5, %sil
+    subb $1, %sil
+    andb $7, %sil
+    shlb $5, %sil
+    andb $31, %dl
+    movb %dl, %al
+    orb %sil, %al
+    movb %al, %dl
+    andb $1, %dl
+    movzbl %dl, %edx
+    movl %edx, %edx
+    movb %al, %sil
+    shrb $1, %sil
+    andb $15, %sil
+    movzbl %sil, %esi
+    movl %esi, %esi
+    imulq $10, %rsi, %rsi
+    addq %rsi, %rdx
+    sarb $5, %al
+    movsbq %al, %rax
+    imulq $100, %rax, %rax
+    addq %rax, %rdx
+    andw $511, %cx
+    movzwq %cx, %rax
+    movq %rdx, %rcx
+    addq %rax, %rcx
+    movq %rcx, %rax
+    ret

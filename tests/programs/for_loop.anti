@@ -1,0 +1,46 @@
+//! The `for` statement over a range, an array, a slice and a slice by
+//! pointer. `continue` runs the step, so a loop that skips a value still
+//! ends.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+fn main() -> int
+{
+	let total = 0;
+	for i in 0..5 {
+		if i == 2 {
+			continue;
+		}
+		total += i;
+	}
+
+	let a = [10, 20, 30];
+	let sum = 0;
+	for x in a {
+		sum += x;
+	}
+
+	let s = a[1..3];
+	let part = 0;
+	for x in s {
+		part += x;
+	}
+	for p in &s {
+		*p = *p + 1;
+	}
+	let after = 0;
+	for x in s {
+		after += x;
+	}
+
+	let stopped = 0;
+	for i in 0..10 {
+		if i == 3 {
+			break;
+		}
+		stopped = i;
+	}
+	printf("%d %d %d %d %d\n".ptr, total as c_int, sum as c_int,
+		part as c_int, after as c_int, stopped as c_int);
+	return 0;
+}

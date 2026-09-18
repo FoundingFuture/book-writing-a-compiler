@@ -1,0 +1,78 @@
+//! An object writes itself as JSON, a class writes its own members, and
+//! a member of a JSON object is read back by name.
+import anti.io;
+import anti.json;
+import anti.text;
+
+class Point
+{
+	pub x: int = 0,
+	pub y: int = 0,
+}
+
+class Named
+{
+	inherits Point,
+	pub mark: int = 0,
+	pub own tag: *Point,
+
+	concrete fn serialize(self, out: *text.Builder)
+	{
+		out.append("{\"type\":\"Named\",\"name\":");
+		json.write_text(self.name(), out);
+		out.append(",\"mark\":");
+		json.write_int(self.mark, out);
+		out.append(",\"sharp\":");
+		json.write_bool(self.mark > 0, out);
+		out.append("}");
+	}
+
+	fn name(self) -> str
+	{
+		return "a\"b\nc";
+	}
+}
+
+fn main() -> int
+{
+	let p = alloc Point { x: 3, y: -4 };
+	let b = text.Builder.new();
+	json.write(p, &b);
+	io.println(b.text());
+	delete(p);
+
+	let n = alloc Named { x: 1, y: 2, mark: 7, tag: null };
+	b.clear();
+	json.write(n, &b);
+	io.println(b.text());
+	delete(n);
+
+	b.clear();
+	json.write(null, &b);
+	io.println(b.text());
+
+	let source = "{\"type\":\"Point\",\"x\":3,\"y\":-4,\"inner\":{\"x\":1},\"tag\":\"one, two\"}";
+	let found = "";
+	if !json.member(source, "y", &found) {
+		return 1;
+	}
+	io.println(found);
+	if !json.member(source, "inner", &found) {
+		return 2;
+	}
+	io.println(found);
+	if !json.member(source, "tag", &found) {
+		return 3;
+	}
+	io.println(found);
+	if json.member(source, "missing", &found) {
+		return 4;
+	}
+
+	b.clear();
+	if !json.unquote("\"a\\\"b\\nc\"", &b) {
+		return 5;
+	}
+	io.println(b.text());
+	return 0;
+}

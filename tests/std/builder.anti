@@ -1,0 +1,31 @@
+//! `text.Builder` collects bytes and gives the `str` of them, and
+//! `Error.text` writes an error and its causes into one.
+import anti.error;
+import anti.io;
+import anti.text;
+
+fn shutting_down()
+{
+	io.println("about to end");
+}
+
+fn main() -> int
+{
+	error.on_fatal(shutting_down);
+	let b = text.Builder.new();
+	b.append("one");
+	b.append(" two");
+	b.append_byte(33);
+	io.println(b.text());
+	if b.len() != 8 {
+		return 1;
+	}
+
+	let below = error.Error.new(2, "no such file");
+	let e = error.Error.wrap(3, "cannot read the configuration", below);
+	let out = text.Builder.new();
+	e.text(&out);
+	io.println(out.text());
+	delete(e);
+	return 0;
+}

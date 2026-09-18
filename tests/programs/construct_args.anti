@@ -1,0 +1,39 @@
+//! A `construct` with arguments may fail. `alloc T(args)` runs it on
+//! the heap and frees the object when it fails, and a handler may put
+//! another pointer in its place.
+import anti.error;
+import anti.io;
+
+class Circle
+{
+	pub r: f32 = 0.0,
+
+	fn construct(self, r: f32) -> *error.Error
+	{
+		if r <= 0.0 {
+			return error.Error.new(1, "radius must be positive");
+		}
+		self.r = r;
+		return null;
+	}
+}
+
+fn main() -> int
+{
+	let c = alloc Circle(2.0) catch fatal;
+	io.println("made");
+	delete(c);
+	let value = Circle(3.0) catch fatal;
+	if value.r < 2.9 {
+		return 2;
+	}
+	io.println("value");
+	let bad = alloc Circle(-1.0) catch e {
+		io.println("refused");
+		yield null;
+	};
+	if bad != null {
+		return 1;
+	}
+	return 0;
+}

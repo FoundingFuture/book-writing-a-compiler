@@ -1,0 +1,32 @@
+//! The pointer-free test of `parallel` exempts the table pointer and
+//! the `own` fields of a class, so a slice of class values chunks
+//! like any array.
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+class Circle
+{
+	pub r: int = 0,
+}
+
+worker fn total(part: []Circle) -> int
+{
+	let sum = 0;
+	for c in part {
+		sum = sum + c.r;
+	}
+	return sum;
+}
+
+fn main() -> int
+{
+	let room = alloc([4]Circle, 1);
+	let i = 0;
+	while i < 4 do {
+		(*room)[i] = Circle { r: i + 1 };
+		i += 1;
+	}
+	let all = (*room)[0..4];
+	let parts = parallel all by 2 -> total;
+	printf("%d %d\n".ptr, parts[0] as c_int, parts[1] as c_int);
+	return 0;
+}

@@ -1,0 +1,101 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+struct Vector2
+{
+	x: f32,
+	y: f32,
+}
+
+struct Vector3
+{
+	x: f32,
+	y: f32,
+	z: f32,
+}
+
+struct Vector4
+{
+	x: f32,
+	y: f32,
+	z: f32,
+	w: f32,
+}
+
+struct Matrix
+{
+	m0: f32,
+	m4: f32,
+	m8: f32,
+	m12: f32,
+	m1: f32,
+	m5: f32,
+	m9: f32,
+	m13: f32,
+	m2: f32,
+	m6: f32,
+	m10: f32,
+	m14: f32,
+	m3: f32,
+	m7: f32,
+	m11: f32,
+	m15: f32,
+}
+
+extern fn Vector2Add(v1: Vector2, v2: Vector2) -> Vector2;
+extern fn Vector2Rotate(v: Vector2, angle: f32) -> Vector2;
+extern fn Vector3CrossProduct(v1: Vector3, v2: Vector3) -> Vector3;
+extern fn Vector3Transform(v: Vector3, mat: Matrix) -> Vector3;
+extern fn Vector3RotateByQuaternion(v: Vector3, q: Vector4) -> Vector3;
+extern fn MatrixMultiply(left: Matrix, right: Matrix) -> Matrix;
+extern fn MatrixRotateZ(angle: f32) -> Matrix;
+extern fn MatrixTranslate(x: f32, y: f32, z: f32) -> Matrix;
+extern fn QuaternionFromEuler(pitch: f32, yaw: f32, roll: f32) -> Vector4;
+extern fn QuaternionMultiply(q1: Vector4, q2: Vector4) -> Vector4;
+
+fn line(v: f32)
+{
+	let format = alloc(byte, 6);
+	format[0] = 37;
+	format[1] = 46;
+	format[2] = 57;
+	format[3] = 103;
+	format[4] = 10;
+	format[5] = 0;
+	printf(format, v as f64);
+	free(format);
+}
+
+fn main() -> int
+{
+	let a = Vector2Add(Vector2 { x: 1.5, y: -2.0 }, Vector2 { x: 0.25, y: 8.0 });
+	line(a.x);
+	line(a.y);
+	let r = Vector2Rotate(a, 0.5);
+	line(r.x);
+	line(r.y);
+	let c = Vector3CrossProduct(Vector3 { x: 1.0, y: 2.0, z: 3.0 },
+		Vector3 { x: -4.0, y: 0.5, z: 2.0 });
+	line(c.x);
+	line(c.y);
+	line(c.z);
+	let m = MatrixMultiply(MatrixRotateZ(0.25), MatrixTranslate(3.0, -1.0, 2.0));
+	line(m.m0);
+	line(m.m4);
+	line(m.m12);
+	line(m.m13);
+	let t = Vector3Transform(c, m);
+	line(t.x);
+	line(t.y);
+	line(t.z);
+	let q = QuaternionMultiply(QuaternionFromEuler(0.1, 0.2, 0.3),
+		QuaternionFromEuler(-0.4, 0.5, 0.6));
+	line(q.x);
+	line(q.y);
+	line(q.z);
+	line(q.w);
+	let v = Vector3RotateByQuaternion(Vector3 { x: 1.0, y: 0.0, z: 0.0 }, q);
+	line(v.x);
+	line(v.y);
+	line(v.z);
+	return 0;
+}

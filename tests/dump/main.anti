@@ -1,0 +1,10 @@
+fn scale(x: int) -> int
+{
+	let k = 2 + 4;
+	return x * k;
+}
+
+fn main() -> int
+{
+	return scale(7);
+}

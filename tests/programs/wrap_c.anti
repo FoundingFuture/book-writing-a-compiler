@@ -1,0 +1,54 @@
+//! A class that wraps a C struct from a binding. The class owns the
+//! handle the C library gave it, its `destruct` body hands the handle back,
+//! and `delete` runs that body before it frees the object.
+
+extern fn fopen(path: *byte, mode: *byte) -> *byte;
+extern fn fclose(file: *byte) -> c_int;
+extern fn fputs(text: *byte, file: *byte) -> c_int;
+extern fn fgets(buffer: *byte, size: c_int, file: *byte) -> *byte;
+extern fn remove(path: *byte) -> c_int;
+extern fn printf(format: *byte, ...) -> c_int;
+
+class TextFile
+{
+	own handle: *byte,
+
+	pub fn open(path: str, mode: str) -> *TextFile
+	{
+		return alloc TextFile { handle: fopen(path.ptr, mode.ptr) };
+	}
+
+	pub fn write(self, line: str) -> int
+	{
+		return fputs(line.ptr, self.handle) as int;
+	}
+
+	pub fn read(self, into: []byte) -> bool
+	{
+		return fgets(into.ptr, into.len as c_int, self.handle) != null;
+	}
+
+	concrete fn destruct(self)
+	{
+		fclose(self.handle);
+		self.handle = null;
+	}
+}
+
+fn main() -> int
+{
+	let path = "wrap_c.txt";
+	let out = TextFile.open(path, "w");
+
+	out.write("one line\n");
+	delete(out);
+
+	let room: [32]byte = [0; 32];
+	let back = TextFile.open(path, "r");
+	let ok = back.read(room[0..32]);
+	delete(back);
+	remove(path.ptr);
+
+	printf("%d %s".ptr, ok as c_int, room[0..32].ptr);
+	return 0;
+}

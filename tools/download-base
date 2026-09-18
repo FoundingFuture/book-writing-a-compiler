@@ -1,0 +1,4 @@
+# Where the binaries of Anti are served. Every packer reads this line, and a
+# move of the prefix is a change here. The layout under it is
+# <component>/<version>/<file>, as docs/distribution.md describes.
+https://anti-lang.com/downloads/resources

@@ -1,0 +1,47 @@
+//! `dispatch` gives one object to the pool and gives a job back. The pool
+//! holds the address of the object from the dispatch until the worker
+//! returns, so a second dispatch of the same object gives no job, and
+//! `join` of that job gives nothing. `join_all` waits for a set.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Counter
+{
+	pub n: int = 0,
+
+	static atomic done: int = 0;
+}
+
+worker fn tally(c: *Counter, add: int) -> int
+{
+	Counter.done.add(1);
+	return c.n + add;
+}
+
+worker fn again(c: *Counter, add: int) -> int
+{
+	/* The object is in flight while this worker holds it, so the
+	   dispatch below gives no job and its join gives zero. */
+	let inner = dispatch c -> tally(add);
+	return join(inner);
+}
+
+fn main() -> int
+{
+	let a = alloc Counter { n: 10 };
+	let b = alloc Counter { n: 20 };
+	let first = dispatch a -> tally(1);
+	let second = dispatch b -> tally(2);
+
+	printf("%d %d\n".ptr, join(first) as c_int, join(second) as c_int);
+
+	let blocked = dispatch a -> again(5);
+	printf("%d\n".ptr, join(blocked) as c_int);
+
+	let jobs = [dispatch a -> tally(3), dispatch b -> tally(4)];
+	join_all(jobs[0..2]);
+	printf("%d\n".ptr, Counter.done.load() as c_int);
+	free(a);
+	free(b);
+	return 0;
+}

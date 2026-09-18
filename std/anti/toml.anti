@@ -1,0 +1,116 @@
+//! Reading a subset of TOML.
+//!
+//! The subset holds bare keys, `[table]` headers, `[[table]]` arrays,
+//! basic strings, integers, floats and booleans. A comment runs from `#`
+//! to the end of its line. Writing TOML is not here.
+//!
+//! A document is a flat list of keys, each the path of its value with a
+//! dot between the parts. A repeated `[[sink]]` numbers its entries, so
+//! the first holds `sink.0.kind`.
+
+import anti.error;
+import anti.text;
+
+extern fn anti_rt_toml_read(bytes: *byte, len: int) -> *byte;
+extern fn anti_rt_toml_count(doc: *byte) -> int;
+extern fn anti_rt_toml_key(doc: *byte, index: int) -> str;
+extern fn anti_rt_toml_value(doc: *byte, index: int) -> str;
+extern fn anti_rt_toml_find(doc: *byte, path: *byte, len: int) -> int;
+extern fn anti_rt_toml_line(doc: *byte, index: int) -> int;
+extern fn anti_rt_toml_free(doc: *byte);
+
+/// One read document.
+///
+/// The document owns its keys and values, so `delete` ends it and every
+/// `str` it gave out ends with it.
+pub class Document
+{
+	own handle: *byte,
+
+	/// The number of keys the document holds.
+	pub fn len(self) -> int
+	{
+		return anti_rt_toml_count(self.handle);
+	}
+
+	/// The path of the key at `index`.
+	pub fn key(self, index: int) -> str
+	{
+		return anti_rt_toml_key(self.handle, index);
+	}
+
+	/// The value at `index`, as the document writes it.
+	pub fn value(self, index: int) -> str
+	{
+		return anti_rt_toml_value(self.handle, index);
+	}
+
+	/// The line the key at `index` came from, counting from 1.
+	pub fn line(self, index: int) -> int
+	{
+		return anti_rt_toml_line(self.handle, index);
+	}
+
+	/// Whether the document holds `path`.
+	pub fn has(self, path: str) -> bool
+	{
+		return anti_rt_toml_find(self.handle, path.ptr, path.len) >= 0;
+	}
+
+	/// The value under `path`, or `fallback` when the document has none.
+	pub fn text_of(self, path: str, fallback: str) -> str
+	{
+		let at = anti_rt_toml_find(self.handle, path.ptr, path.len);
+		if at < 0 {
+			return fallback;
+		}
+		return anti_rt_toml_value(self.handle, at);
+	}
+
+	/// The integer under `path`, or `fallback` when the document has
+	/// none and when the value is no integer.
+	pub fn int_of(self, path: str, fallback: int) -> int
+	{
+		let at = anti_rt_toml_find(self.handle, path.ptr, path.len);
+		if at < 0 {
+			return fallback;
+		}
+		return text.to_int(anti_rt_toml_value(self.handle, at), fallback);
+	}
+
+	/// The boolean under `path`, or `fallback` for anything else.
+	pub fn bool_of(self, path: str, fallback: bool) -> bool
+	{
+		let at = anti_rt_toml_find(self.handle, path.ptr, path.len);
+		if at < 0 {
+			return fallback;
+		}
+		let v = anti_rt_toml_value(self.handle, at);
+		if text.equal(v, "true") {
+			return true;
+		}
+		if text.equal(v, "false") {
+			return false;
+		}
+		return fallback;
+	}
+
+	fn destruct(self)
+	{
+		anti_rt_toml_free(self.handle);
+		self.handle = null;
+	}
+
+	/// Read `source` as a TOML document.
+	///
+	/// A text outside the subset gives an error with code 1.
+	pub fn read(source: str, out: *Document) -> *error.Error
+	{
+		let handle = anti_rt_toml_read(source.ptr, source.len);
+		if handle == null {
+			return error.Error.new(1, "the text is not the TOML subset");
+		}
+		*out = Document { handle: handle };
+		return null;
+	}
+}

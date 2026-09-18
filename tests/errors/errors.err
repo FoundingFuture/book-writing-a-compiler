@@ -1,0 +1,4 @@
+errors.anti:11:2: error: the error of `risky` is not handled
+errors.anti:21:14: error: `e` outlives its `catch`, use `dup`
+errors.anti:29:2: error: `yield` stands in a `catch` handler
+errors.anti:27:4: error: `no_place` can reach its end without `return`

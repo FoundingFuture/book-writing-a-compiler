@@ -1,0 +1,48 @@
+floatcalls.calls:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #32
+    str d8, [sp, #24]
+    str d9, [sp, #16]
+    fmov d8, d0
+    str d8, [sp]
+    mov x9, #3
+    str x9, [sp, #8]
+    bl printf
+    mov x0, #1
+    fmov d0, d8
+    mov x1, #2
+    movz w9, #16128, lsl #16
+    fmov s1, w9
+    bl mix
+    fmov d9, d0
+    movz w9, #16256, lsl #16
+    fmov s18, w9
+    str s18, [sp]
+    movz w9, #16384, lsl #16
+    fmov s18, w9
+    str s18, [sp, #4]
+    fmov d0, d8
+    fmov d1, d8
+    fmov d2, d8
+    fmov d3, d8
+    fmov d4, d8
+    fmov d5, d8
+    fmov d6, d8
+    fmov d7, d8
+    bl nine
+    fcvt d18, s0
+    fadd d0, d9, d18
+    ldr d8, [sp, #24]
+    ldr d9, [sp, #16]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret
+floatcalls.last:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    ldr s0, [x29, #20]
+    ldp x29, x30, [sp], #16
+    ret

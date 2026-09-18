@@ -1,0 +1,276 @@
+//! The ABI probe in Anti. It prints what probe.c prints for the same
+//! types, so any difference in layout shows as a difference in the output.
+//! Every byte image it prints is of an object it cleared first, and the
+//! one case that cannot clear the object prints the fields instead. See
+//! the design note at the head of probe.c.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+struct Wide
+{
+	a: i8,
+	b: c_long,
+	c: c_wchar,
+	d: i16,
+}
+
+struct WideBox
+{
+	c: u8,
+	t: Wide,
+}
+
+union Mixed
+{
+	a: i8,
+	b: i32,
+	c: f64,
+	d: i64,
+}
+
+struct MixedBox
+{
+	c: u8,
+	t: Mixed,
+}
+
+struct Flags
+{
+	visible: u32 : 1,
+	layer: u32 : 4,
+	level: i8 : 3,
+	pad: u16 : 9,
+}
+
+struct FlagsBox
+{
+	c: u8,
+	t: Flags,
+}
+
+struct Spread
+{
+	a: i8,
+	b: u32 : 5,
+	c: i64 : 40,
+	d: u8 : 7,
+}
+
+struct SpreadBox
+{
+	c: u8,
+	t: Spread,
+}
+
+packed struct Tight
+{
+	a: i8,
+	b: i32,
+	c: i16,
+}
+
+struct TightBox
+{
+	c: u8,
+	t: Tight,
+}
+
+packed struct TightBits
+{
+	a: u8 : 3,
+	b: u32 : 7,
+}
+
+struct TightBitsBox
+{
+	c: u8,
+	t: TightBits,
+}
+
+struct Aligned align(16)
+{
+	a: i8,
+	b: i32,
+}
+
+struct AlignedBox
+{
+	c: u8,
+	t: Aligned,
+}
+
+union BitUnion
+{
+	a: u32 : 3,
+	b: u8 : 7,
+}
+
+struct BitUnionBox
+{
+	c: u8,
+	t: BitUnion,
+}
+
+struct Breaks
+{
+	a: u8,
+	_: u32 : 0,
+	b: u8 : 3,
+	_: u64 : 0,
+	c: u8 : 5,
+}
+
+struct BreaksBox
+{
+	c: u8,
+	t: Breaks,
+}
+
+const BREAKS: Breaks = Breaks { a: 1, b: 2, c: 3 };
+
+fn clear(p: *byte, n: int)
+{
+	let i = 0;
+	while i < n do {
+		p[i] = 0;
+		i += 1;
+	}
+}
+
+fn dump(name: str, p: *byte, n: int)
+{
+	printf("%s".ptr, name.ptr);
+	let i = 0;
+	while i < n do {
+		printf(" %02x".ptr, p[i] as c_int);
+		i += 1;
+	}
+	printf("\n".ptr);
+}
+
+fn size(name: str, n: int, box: int)
+{
+	printf("%s size %d align %d\n".ptr, name.ptr, n as c_int,
+		(box - n) as c_int);
+}
+
+fn main() -> int
+{
+	size("Wide", size_of(Wide), size_of(WideBox));
+	let wide = alloc(Wide, 1);
+	clear(wide as *byte, size_of(Wide));
+	wide.a = 1;
+	dump("Wide.a", wide as *byte, size_of(Wide));
+	clear(wide as *byte, size_of(Wide));
+	wide.b = 1;
+	dump("Wide.b", wide as *byte, size_of(Wide));
+	clear(wide as *byte, size_of(Wide));
+	wide.c = 1;
+	dump("Wide.c", wide as *byte, size_of(Wide));
+	clear(wide as *byte, size_of(Wide));
+	wide.d = 1;
+	dump("Wide.d", wide as *byte, size_of(Wide));
+	free(wide);
+	size("Mixed", size_of(Mixed), size_of(MixedBox));
+	let mixed = alloc(Mixed, 1);
+	clear(mixed as *byte, size_of(Mixed));
+	mixed.a = 1;
+	dump("Mixed.a", mixed as *byte, size_of(Mixed));
+	clear(mixed as *byte, size_of(Mixed));
+	mixed.b = 1;
+	dump("Mixed.b", mixed as *byte, size_of(Mixed));
+	clear(mixed as *byte, size_of(Mixed));
+	mixed.c = 1.0;
+	dump("Mixed.c", mixed as *byte, size_of(Mixed));
+	clear(mixed as *byte, size_of(Mixed));
+	mixed.d = 1;
+	dump("Mixed.d", mixed as *byte, size_of(Mixed));
+	free(mixed);
+	size("Flags", size_of(Flags), size_of(FlagsBox));
+	let flags = alloc(Flags, 1);
+	clear(flags as *byte, size_of(Flags));
+	flags.visible = 1;
+	dump("Flags.visible", flags as *byte, size_of(Flags));
+	clear(flags as *byte, size_of(Flags));
+	flags.layer = 1;
+	dump("Flags.layer", flags as *byte, size_of(Flags));
+	clear(flags as *byte, size_of(Flags));
+	flags.level = 1;
+	dump("Flags.level", flags as *byte, size_of(Flags));
+	clear(flags as *byte, size_of(Flags));
+	flags.pad = 1;
+	dump("Flags.pad", flags as *byte, size_of(Flags));
+	free(flags);
+	size("Spread", size_of(Spread), size_of(SpreadBox));
+	let spread = alloc(Spread, 1);
+	clear(spread as *byte, size_of(Spread));
+	spread.a = 1;
+	dump("Spread.a", spread as *byte, size_of(Spread));
+	clear(spread as *byte, size_of(Spread));
+	spread.b = 1;
+	dump("Spread.b", spread as *byte, size_of(Spread));
+	clear(spread as *byte, size_of(Spread));
+	spread.c = 1;
+	dump("Spread.c", spread as *byte, size_of(Spread));
+	clear(spread as *byte, size_of(Spread));
+	spread.d = 1;
+	dump("Spread.d", spread as *byte, size_of(Spread));
+	free(spread);
+	size("Tight", size_of(Tight), size_of(TightBox));
+	let tight = alloc(Tight, 1);
+	clear(tight as *byte, size_of(Tight));
+	tight.a = 1;
+	dump("Tight.a", tight as *byte, size_of(Tight));
+	clear(tight as *byte, size_of(Tight));
+	tight.b = 1;
+	dump("Tight.b", tight as *byte, size_of(Tight));
+	clear(tight as *byte, size_of(Tight));
+	tight.c = 1;
+	dump("Tight.c", tight as *byte, size_of(Tight));
+	free(tight);
+	size("TightBits", size_of(TightBits), size_of(TightBitsBox));
+	let tightBits = alloc(TightBits, 1);
+	clear(tightBits as *byte, size_of(TightBits));
+	tightBits.a = 1;
+	dump("TightBits.a", tightBits as *byte, size_of(TightBits));
+	clear(tightBits as *byte, size_of(TightBits));
+	tightBits.b = 1;
+	dump("TightBits.b", tightBits as *byte, size_of(TightBits));
+	free(tightBits);
+	size("Aligned", size_of(Aligned), size_of(AlignedBox));
+	let aligned = alloc(Aligned, 1);
+	clear(aligned as *byte, size_of(Aligned));
+	aligned.a = 1;
+	dump("Aligned.a", aligned as *byte, size_of(Aligned));
+	clear(aligned as *byte, size_of(Aligned));
+	aligned.b = 1;
+	dump("Aligned.b", aligned as *byte, size_of(Aligned));
+	free(aligned);
+	size("BitUnion", size_of(BitUnion), size_of(BitUnionBox));
+	let bitUnion = alloc(BitUnion, 1);
+	clear(bitUnion as *byte, size_of(BitUnion));
+	bitUnion.a = 1;
+	dump("BitUnion.a", bitUnion as *byte, size_of(BitUnion));
+	clear(bitUnion as *byte, size_of(BitUnion));
+	bitUnion.b = 1;
+	dump("BitUnion.b", bitUnion as *byte, size_of(BitUnion));
+	free(bitUnion);
+	size("Breaks", size_of(Breaks), size_of(BreaksBox));
+	let breaks = alloc(Breaks, 1);
+	clear(breaks as *byte, size_of(Breaks));
+	breaks.a = 1;
+	dump("Breaks.a", breaks as *byte, size_of(Breaks));
+	clear(breaks as *byte, size_of(Breaks));
+	breaks.b = 1;
+	dump("Breaks.b", breaks as *byte, size_of(Breaks));
+	clear(breaks as *byte, size_of(Breaks));
+	breaks.c = 1;
+	dump("Breaks.c", breaks as *byte, size_of(Breaks));
+	// A constant copied into an object of the type. The padding of the
+	// copy is unspecified, so the fields are read back.
+	*breaks = BREAKS;
+	printf("Breaks.const a %d b %d c %d\n".ptr, breaks.a as c_int,
+		breaks.b as c_int, breaks.c as c_int);
+	free(breaks);
+	return 0;
+}

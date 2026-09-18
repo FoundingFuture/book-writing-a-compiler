@@ -1,0 +1,12 @@
+exit 0
+base 1
+derived 11
+inside 1 11
+derived out 11
+base out 1
+after
+base 6
+derived 16
+heap 6 16
+derived out 16
+base out 6

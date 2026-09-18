@@ -1,0 +1,43 @@
+//! A `use` field promotes the fields of its type and the public
+//! functions of its body onto the class that holds it. The rewrite is a
+//! field access and a direct call, so nothing below the checker knows
+//! about promotion.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+struct Rect
+{
+	x: int,
+	y: int,
+}
+
+class Hitbox
+{
+	pub radius: int = 1,
+
+	pub fn reach(self) -> int
+	{
+		return self.radius * 2;
+	}
+}
+
+class Sprite
+{
+	use rect: Rect,
+	use box: Hitbox,
+	pub texture: int = 0,
+
+	pub fn show(self) -> int
+	{
+		return self.x + self.reach();
+	}
+}
+
+fn main() -> int
+{
+	let s = Sprite { rect: Rect { x: 3, y: 4 },
+		box: Hitbox { radius: 5 }, texture: 1 };
+	printf("%d %d %d %d\n".ptr, s.x as c_int, s.y as c_int,
+		s.reach() as c_int, s.show() as c_int);
+	return 0;
+}

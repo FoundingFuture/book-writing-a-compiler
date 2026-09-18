@@ -1,0 +1,43 @@
+floats.keep:
+b0:
+    fmov d18, d0
+    ldr s19, [x0]
+    movz w9, #16128, lsl #16
+    fmov s20, w9
+    fmul s19, s19, s20
+    fsub s19, s19, s1
+    str s19, [x0]
+    movz x9, #16376, lsl #48
+    fmov d19, x9
+    fcmp d18, d19
+    cset w9, mi
+    cbz w9, b3
+b1:
+    fneg d0, d18
+    ret
+b2:
+    fcvt d19, s1
+    fdiv d0, d18, d19
+    ret
+b3:
+    fcmp d18, d18
+    cset w9, ne
+    cbnz w9, b1
+    b b2
+floats.convert:
+b0:
+    sxtb w9, w0
+    scvtf s18, w9
+    fadd s18, s18, s1
+    ucvtf d19, x1
+    fmul d19, d19, d0
+    fcvt d18, s18
+    fadd d18, d18, d19
+    fcvtzu x9, d18
+    fcvtzs w10, d0
+    sxtw x10, w10
+    add x9, x9, x10
+    fcvtzu w10, s1
+    mov w10, w10
+    add x0, x9, x10
+    ret

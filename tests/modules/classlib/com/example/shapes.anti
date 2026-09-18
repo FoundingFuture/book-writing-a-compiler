@@ -1,0 +1,30 @@
+//! A library whose interface holds a class and an enum. The library file
+//! carries the layout of both, the table and the descriptor of the class,
+//! and the chain back to the root.
+
+pub enum Kind: u8 { Round, Square }
+
+pub class Shape
+{
+	pub kind: Kind = Kind.Round,
+	pub size: int = 1,
+
+	pub fn area(self) -> int
+	{
+		return self.size * self.size;
+	}
+}
+
+pub class Big
+{
+	inherits Shape,
+	concrete fn area(self) -> int
+	{
+		return 100 * self.size;
+	}
+}
+
+pub fn make(n: int) -> Shape
+{
+	return Shape { size: n };
+}

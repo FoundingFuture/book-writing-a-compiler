@@ -1,0 +1,56 @@
+spill12.many:
+b0:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    sub sp, sp, #96
+    str x19, [sp, #88]
+    str x20, [sp, #80]
+    str x21, [sp, #72]
+    str x22, [sp, #64]
+    str x23, [sp, #56]
+    str x24, [sp, #48]
+    str x25, [sp, #40]
+    str x26, [sp, #32]
+    str x27, [sp, #24]
+    str x28, [sp, #16]
+    add x19, x0, #1
+    add x20, x0, #2
+    add x21, x0, #3
+    add x22, x0, #4
+    add x23, x0, #5
+    add x24, x0, #6
+    add x25, x0, #7
+    add x26, x0, #8
+    add x27, x0, #9
+    add x28, x0, #10
+    add x16, x0, #11
+    str x16, [sp]
+    add x16, x0, #12
+    str x16, [sp, #8]
+    bl tick
+    add x9, x19, x20
+    add x9, x9, x21
+    add x9, x9, x22
+    add x9, x9, x23
+    add x9, x9, x24
+    add x9, x9, x25
+    add x9, x9, x26
+    add x9, x9, x27
+    add x9, x9, x28
+    ldr x16, [sp]
+    add x9, x9, x16
+    ldr x16, [sp, #8]
+    add x0, x9, x16
+    ldr x19, [sp, #88]
+    ldr x20, [sp, #80]
+    ldr x21, [sp, #72]
+    ldr x22, [sp, #64]
+    ldr x23, [sp, #56]
+    ldr x24, [sp, #48]
+    ldr x25, [sp, #40]
+    ldr x26, [sp, #32]
+    ldr x27, [sp, #24]
+    ldr x28, [sp, #16]
+    mov sp, x29
+    ldp x29, x30, [sp], #16
+    ret

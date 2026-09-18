@@ -1,0 +1,48 @@
+//! A class carries its base at offset 0 and the table pointer of the root
+//! before it. A literal names the fields of the whole chain in any order,
+//! defaults from every level apply, and a member function reaches an
+//! inherited field through `self`.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Shape
+{
+	pub x: f32 = 1.0,
+	pub y: f32 = 2.0,
+
+	pub fn move(self, dx: f32, dy: f32)
+	{
+		self.x = self.x + dx;
+		self.y = self.y + dy;
+	}
+
+	pub fn span(self) -> f32
+	{
+		return self.x + self.y;
+	}
+}
+
+final class Circle
+{
+	inherits Shape,
+	pub r: f32 = 3.0,
+
+	pub fn area(self) -> f32
+	{
+		return 3.0 * self.r * self.r;
+	}
+}
+
+fn main() -> int
+{
+	let c = Circle { r: 2.0, x: 10.0 };
+	let d = Circle { x: 0.0, y: 0.0, r: 1.0 };
+
+	c.move(1.0, 1.0);
+	printf("%d %d %d %d\n".ptr, c.x as c_int, c.y as c_int,
+		c.area() as c_int, c.span() as c_int);
+	printf("%d %d\n".ptr, d.r as c_int, d.span() as c_int);
+	printf("%d %d\n".ptr, size_of(Shape) as c_int,
+		size_of(Circle) as c_int);
+	return 0;
+}

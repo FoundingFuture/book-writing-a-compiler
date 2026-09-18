@@ -1,0 +1,44 @@
+//! A program registers a function for a signal and raises it. The
+//! runtime calls the function on a thread of its own, so the function
+//! does what any other function may.
+import anti.io;
+import anti.os;
+
+extern fn raise(sig: c_int) -> c_int;
+
+extern fn anti_rt_atomic_load(address: *int, width: int) -> int;
+extern fn anti_rt_atomic_store(address: *int, width: int, value: int);
+
+singleton class Seen
+{
+	atomic count: int = 0,
+}
+
+fn caught(sig: int)
+{
+	Seen.get().count.add(sig);
+}
+
+fn main() -> int
+{
+	os.on_signal(os.INTERRUPT, caught);
+	raise(os.INTERRUPT as c_int);
+	/* The runtime reads the pipe on a thread, so the program waits for
+	   the count to change. */
+	let spins = 0;
+	while Seen.get().count.load() == 0 && spins < 100000000 do {
+		spins += 1;
+	}
+	if Seen.get().count.load() != os.INTERRUPT {
+		return 1;
+	}
+	io.println("caught");
+	if os.signal_pending() != os.INTERRUPT {
+		return 2;
+	}
+	if os.signal_pending() != 0 {
+		return 3;
+	}
+	io.println("cleared");
+	return 0;
+}

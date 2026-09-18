@@ -1,0 +1,7 @@
+exit 0
+warn to the file
+error also to the file
+info test one
+warn test two
+error test three
+info test four

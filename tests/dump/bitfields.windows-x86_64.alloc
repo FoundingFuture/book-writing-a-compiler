@@ -1,0 +1,64 @@
+bitfields.main:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    subq $16, %rsp
+    .seh_stackalloc 16
+    movq %rbx, 8(%rsp)
+    .seh_savereg %rbx, 8
+    .seh_endprologue
+    movb %al, %r8b
+    andb $-2, %r8b
+    orb $1, %r8b
+    andb $-31, %r8b
+    orb $18, %r8b
+    movb %cl, %r9b
+    andb $-8, %r9b
+    orb $5, %r9b
+    movw %dx, %bx
+    andw $-512, %bx
+    movw %bx, %dx
+    orw $300, %dx
+    movb %r8b, %bl
+    shrb $1, %bl
+    andb $15, %bl
+    movzbl %bl, %ebx
+    addl $3, %ebx
+    andb $15, %bl
+    shlb $1, %bl
+    andb $-31, %r8b
+    movb %r8b, %al
+    orb %bl, %al
+    movb %r9b, %r8b
+    shlb $5, %r8b
+    sarb $5, %r8b
+    subb $1, %r8b
+    andb $7, %r8b
+    andb $-8, %r9b
+    movb %r9b, %cl
+    orb %r8b, %cl
+    movb %al, %r8b
+    andb $1, %r8b
+    movzbl %r8b, %r8d
+    movl %r8d, %r8d
+    shrb $1, %al
+    andb $15, %al
+    movzbl %al, %eax
+    movl %eax, %eax
+    imulq $10, %rax, %rax
+    addq %rax, %r8
+    shlb $5, %cl
+    sarb $5, %cl
+    movsbq %cl, %rax
+    imulq $100, %rax, %rax
+    addq %rax, %r8
+    andw $511, %dx
+    movzwq %dx, %rax
+    movq %r8, %rcx
+    addq %rax, %rcx
+    movq %rcx, %rax
+    movq 8(%rsp), %rbx
+    addq $16, %rsp
+    popq %rbp
+    ret

@@ -1,0 +1,12 @@
+exit 0
+build/anti
+one
+-two
+usage: pin [options]
+pin a version of a package
+
+  -h, --help            write this text and stop
+  -v, --verbose         write more about what happens
+  -o, --output <value>  the file to write
+  -j, --jobs <value>    how many jobs run at once
+unknown option: --missing

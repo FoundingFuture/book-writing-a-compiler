@@ -1,0 +1,11 @@
+struct H
+{
+	tag: u8,
+	n: i32,
+}
+
+fn f() -> int
+{
+	let n = size_of(H);
+	return n * 1 + 4 - 4;
+}

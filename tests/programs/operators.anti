@@ -1,0 +1,56 @@
+//! An operator calls the function of its name on the left operand's
+//! type. `!=`, `>`, `<=` and `>=` derive from `eq` and `lt`, and a
+//! struct takes its operators from free functions of its module.
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+class Vec2
+{
+	pub x: int = 0,
+	pub y: int = 0,
+
+	operator fn add(self, o: Vec2) -> Vec2
+	{
+		return Vec2 { x: self.x + o.x, y: self.y + o.y };
+	}
+
+	operator fn eq(self, o: Vec2) -> bool
+	{
+		return self.x == o.x && self.y == o.y;
+	}
+
+	operator fn lt(self, o: Vec2) -> bool
+	{
+		return self.x < o.x;
+	}
+
+	operator fn neg(self) -> Vec2
+	{
+		return Vec2 { x: 0 - self.x, y: 0 - self.y };
+	}
+}
+
+struct Pair
+{
+	a: int,
+	b: int,
+}
+
+operator fn add(x: Pair, y: Pair) -> Pair
+{
+	return Pair { a: x.a + y.a, b: x.b + y.b };
+}
+
+fn main() -> int
+{
+	let p = Pair { a: 1, b: 2 } + Pair { a: 10, b: 20 };
+	printf("%d %d\n".ptr, p.a as c_int, p.b as c_int);
+	let a = Vec2 { x: 1, y: 2 };
+	let b = Vec2 { x: 3, y: 4 };
+	let c = a + b;
+	printf("%d %d\n".ptr, c.x as c_int, c.y as c_int);
+	printf("%d %d %d %d\n".ptr, (a == b) as c_int, (a != b) as c_int,
+		(a < b) as c_int, (a > b) as c_int);
+	let n = -a;
+	printf("%d %d\n".ptr, n.x as c_int, n.y as c_int);
+	return 0;
+}

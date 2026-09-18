@@ -1,0 +1,50 @@
+//! `p is *T` compares the ancestor of the object at T's depth with T's
+//! descriptor, so it holds for T and every class below it. `p as? *T`
+//! gives null where the test fails, and `p as *T` traps there.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+abstract class Shape
+{
+	abstract fn area(self) -> int;
+}
+
+class Square
+{
+	inherits Shape,
+	pub side: int = 3,
+
+	concrete fn area(self) -> int
+	{
+		return self.side * self.side;
+	}
+}
+
+class Box
+{
+	inherits Shape,
+	w: int = 2,
+
+	concrete fn area(self) -> int
+	{
+		return self.w;
+	}
+}
+
+fn main() -> int
+{
+	let s = Square { };
+	let b = Box { };
+	let p: *Shape = &s;
+	let q: *Shape = &b;
+
+	printf("%d %d %d %d\n".ptr, (p is *Square) as c_int,
+		(p is *Box) as c_int, (q is *Square) as c_int,
+		(p is *Shape) as c_int);
+	let r = p as? *Square;
+	let n = q as? *Square;
+	printf("%d %d\n".ptr, r.area() as c_int, (n == null) as c_int);
+	let t = p as *Square;
+	printf("%d\n".ptr, t.side as c_int);
+	return 0;
+}

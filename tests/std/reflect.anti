@@ -1,0 +1,55 @@
+//! A program reads its own classes. The descriptor of an object names
+//! the class, lists the fields it declares and the public functions of
+//! the whole chain, and `get` and `set` reach one field by its index.
+import anti.io;
+import anti.reflect;
+import anti.text;
+
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+class Point
+{
+	pub x: int = 1,
+	pub y: int = 2,
+
+	pub fn sum(self) -> int
+	{
+		return self.x + self.y;
+	}
+}
+
+class Marked
+{
+	inherits Point,
+	pub tag: int = 9,
+}
+
+fn main() -> int
+{
+	let m = alloc Marked { };
+	let d = reflect.describe(m as *byte);
+	io.println(reflect.name(d));
+	printf("%d %d\n".ptr, reflect.field_count(d) as c_int,
+		reflect.field_count(reflect.parent(d)) as c_int);
+
+	let tag = reflect.field(d, 0);
+	printf("%s %d %d\n".ptr, tag.name.ptr, tag.kind as c_int,
+		reflect.get(m as *byte, d, 0) as c_int);
+	reflect.set(m as *byte, d, 0, 42);
+	if m.tag != 42 {
+		return 1;
+	}
+
+	let base = reflect.parent(d);
+	let x = reflect.field(base, 0);
+	printf("%s %d\n".ptr, x.name.ptr,
+		reflect.get(m as *byte, base, 0) as c_int);
+
+	/* The chain's public functions come after the seven of the root. */
+	printf("%d\n".ptr, reflect.function_count(d) as c_int);
+	let last = reflect.function(d, reflect.function_count(d) - 1);
+	printf("%s %d %d\n".ptr, last.name.ptr, last.slot as c_int,
+		last.param_count as c_int);
+	delete(m);
+	return 0;
+}

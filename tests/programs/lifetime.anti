@@ -1,0 +1,50 @@
+//! `delete` runs the destruct body of each class of the chain, the concrete
+//! one first, then frees the memory behind every `own` field and the
+//! object. `destroy` runs the same chain without the final free. `dup`
+//! copies an object of its concrete class and copies its `own` fields.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Node
+{
+	pub n: int = 0,
+	pub own child: *Node,
+
+	concrete fn destruct(self)
+	{
+		printf("destruct Node %d\n".ptr, self.n as c_int);
+	}
+}
+
+class Leaf
+{
+	inherits Node,
+	concrete fn destruct(self)
+	{
+		printf("destruct Leaf %d\n".ptr, self.n as c_int);
+	}
+}
+
+fn main() -> int
+{
+	let inner = alloc Node { n: 1, child: null };
+	let p = alloc Leaf { n: 7, child: inner };
+	let q = dup(p);
+
+	printf("%d %d %d\n".ptr, q.n as c_int, (q != p) as c_int,
+		(q.child != p.child) as c_int);
+	delete(q);
+	delete(p);
+
+	/* A local of a class with a destruct body is torn down at the end
+	   of its block, and `destroy` runs the same chain on a heap object
+	   without freeing it. */
+	{
+		let stack = Node { n: 3, child: null };
+		printf("block %d\n".ptr, stack.n as c_int);
+	}
+	let raw = alloc Node { n: 4, child: null };
+	destroy(raw);
+	free(raw);
+	return 0;
+}

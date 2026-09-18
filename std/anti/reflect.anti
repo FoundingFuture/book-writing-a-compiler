@@ -1,0 +1,121 @@
+//! What a program can read of its own classes at run time.
+//!
+//! Every class carries a descriptor in read-only data, and this module
+//! reads it. `describe` gives the descriptor of an object, `fields` and
+//! `functions` count what it lists, and `get` and `set` read and write
+//! one field by its index. `--no-reflect` drops the two lists, and the
+//! counts are then zero.
+
+import anti.text;
+
+extern fn anti_rt_descriptor(object: *byte) -> *byte;
+extern fn anti_rt_reflect_parent(d: *byte) -> *byte;
+extern fn anti_rt_reflect_field_count(d: *byte) -> int;
+extern fn anti_rt_reflect_field_name(d: *byte, index: int) -> str;
+extern fn anti_rt_reflect_field_offset(d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_field_kind(d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_field_owned(d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_function_count(d: *byte) -> int;
+extern fn anti_rt_reflect_function_name(d: *byte, index: int) -> str;
+extern fn anti_rt_reflect_function_slot(d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_function_params(d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_get(object: *byte, d: *byte, index: int) -> int;
+extern fn anti_rt_reflect_set(object: *byte, d: *byte, index: int,
+	value: int);
+
+/// The kinds a field record carries.
+pub const KIND_I8: int = 1;
+/// A 16-bit integer.
+pub const KIND_I16: int = 2;
+/// A 32-bit integer.
+pub const KIND_I32: int = 3;
+/// A 64-bit integer.
+pub const KIND_I64: int = 4;
+/// A pointer, a slice element or a class reference.
+pub const KIND_PTR: int = 7;
+/// A struct, a str, a slice or an inline class.
+pub const KIND_AGG: int = 8;
+
+/// One field of a class, as its descriptor lists it.
+pub class Field
+{
+	pub name: str = "",
+	pub offset: int = 0,
+	pub kind: int = 0,
+	pub owned: bool = false,
+}
+
+/// One public function of a class, with the entry of its table.
+pub class Function
+{
+	pub name: str = "",
+	pub slot: int = 0,
+	pub param_count: int = 0,
+}
+
+/// The descriptor of the class of `object`.
+pub fn describe(object: *byte) -> *byte
+{
+	return anti_rt_descriptor(object);
+}
+
+/// The descriptor of the base of the class `d` describes, or null.
+pub fn parent(d: *byte) -> *byte
+{
+	return anti_rt_reflect_parent(d);
+}
+
+/// The number of fields the class declares itself.
+pub fn field_count(d: *byte) -> int
+{
+	return anti_rt_reflect_field_count(d);
+}
+
+/// The field at `index`, which is one of `field_count` of them.
+pub fn field(d: *byte, index: int) -> Field
+{
+	return Field {
+		name: anti_rt_reflect_field_name(d, index),
+		offset: anti_rt_reflect_field_offset(d, index),
+		kind: anti_rt_reflect_field_kind(d, index),
+		owned: anti_rt_reflect_field_owned(d, index) != 0,
+	};
+}
+
+/// The number of public functions of the whole chain.
+pub fn function_count(d: *byte) -> int
+{
+	return anti_rt_reflect_function_count(d);
+}
+
+/// The function at `index`, which is one of `function_count` of them.
+pub fn function(d: *byte, index: int) -> Function
+{
+	return Function {
+		name: anti_rt_reflect_function_name(d, index),
+		slot: anti_rt_reflect_function_slot(d, index),
+		param_count: anti_rt_reflect_function_params(d, index),
+	};
+}
+
+/// The bytes of the field at `index`, as an integer of its width.
+///
+/// A field wider than eight bytes gives the address of its first byte.
+pub fn get(object: *byte, d: *byte, index: int) -> int
+{
+	return anti_rt_reflect_get(object, d, index);
+}
+
+/// Write `value` into the field at `index`.
+pub fn set(object: *byte, d: *byte, index: int, value: int)
+{
+	anti_rt_reflect_set(object, d, index, value);
+}
+
+/// The name of the class `d` describes.
+pub fn name(d: *byte) -> str
+{
+	return anti_rt_reflect_class_name(d);
+}
+
+extern fn anti_rt_reflect_class_name(d: *byte) -> str;

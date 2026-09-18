@@ -1,0 +1,5 @@
+exit 4
+[hello] 5
+[grüße] 7
+[two words] 9
+[ANTI_TEST_GREETING=héllo] 25

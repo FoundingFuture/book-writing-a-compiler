@@ -1,0 +1,7 @@
+//! A module of the same package, which sees the internal item.
+import com.example.core;
+
+pub fn total() -> int
+{
+	return core.open() + core.tuning();
+}

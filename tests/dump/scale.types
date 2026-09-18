@@ -1,0 +1,14 @@
+function scale             fn(int) -> int
+  param x                  int
+    type int
+  result
+    type int
+  block
+    let_stmt k             int
+      additive +           int
+        int_lit 2          int
+        int_lit 4          int
+    return_stmt
+      multiplicative *     int
+        ident x            int
+        ident k            int

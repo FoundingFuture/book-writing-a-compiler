@@ -1,0 +1,4 @@
+pub fn one() -> int
+{
+	return 1;
+}

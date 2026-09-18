@@ -1,0 +1,11 @@
+fn main() -> int
+{
+	let k = 2;
+	for i in 0..10 by 0 {
+		return i;
+	}
+	for i in 0..10 by k {
+		return i;
+	}
+	return 0;
+}

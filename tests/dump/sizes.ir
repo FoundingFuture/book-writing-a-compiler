@@ -1,0 +1,50 @@
+type sizes.Header = struct { tag: i8, count: i32, next: ptr }
+type [size_of(sizes.Header)]byte = array size_of sizes.Header of i8
+type str = struct { ptr: ptr, len: i64 }
+type [size_of(sizes.Header) - 12]byte = array sub i64(size_of sizes.Header, 12) of i8
+type sizes.Buffer = struct { head: sizes.Header, pad: [size_of(sizes.Header) - 12]byte }
+extern fn printf(ptr, ...) -> i32
+global sizes.0 size 16 align 1 bytes 25 6c 6c 64 20 25 6c 6c 64 20 25 6c 6c 64 0a 00
+fn sizes.main() -> i64 {
+b0:
+    %0 = slot [size_of(sizes.Header)]byte
+    %15 = slot str
+    %1 = copy i64 0
+    jump b1
+b1:
+    %2 = slt i8 %1, size_of sizes.Header
+    branch %2, b2, b3
+b2:
+    %3 = mul i64 %1, size_of i8
+    %4 = ptradd %0, %3
+    store i8 1, %4
+    %5 = add i64 %1, 1
+    %1 = copy i64 %5
+    jump b1
+b3:
+    %6 = copy i64 0
+    %7 = copy i64 0
+    jump b4
+b4:
+    %8 = slt i8 %7, size_of sizes.Header
+    branch %8, b5, b6
+b5:
+    %9 = mul i64 %7, size_of i8
+    %10 = ptradd %0, %9
+    %11 = load i8 %10
+    %12 = zext i64 %11
+    %13 = add i64 %6, %12
+    %6 = copy i64 %13
+    %14 = add i64 %7, 1
+    %7 = copy i64 %14
+    jump b4
+b6:
+    %16 = addr @sizes.0
+    store ptr %16, %15
+    %17 = ptradd %15, offset_of str.len
+    store i64 15, %17
+    %18 = load ptr %15
+    %19 = call i32 @printf(%18, size_of sizes.Header, %6, size_of sizes.Buffer)
+    %20 = sub i64 size_of sizes.Header, 16
+    ret i64 %20
+}

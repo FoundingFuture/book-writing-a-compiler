@@ -1,0 +1,15 @@
+import anti.io;
+import anti.text;
+
+fn main() -> int
+{
+	let s = text.from_c("h\u{e9}llo".ptr);
+	if !text.equal(s, "h\u{e9}llo") {
+		return 1;
+	}
+	if text.equal(s, "hello") || text.equal(s, "h\u{e9}ll") {
+		return 2;
+	}
+	io.println(s);
+	return text.byte_count(s) * 10 + text.char_count(s);
+}

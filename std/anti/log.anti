@@ -1,0 +1,461 @@
+//! Logging through a level, a sink and a format.
+//!
+//! A program writes with `log.info("...")` and the like, which reach the
+//! logger of the `Log` singleton. `log.set` replaces that logger. Each
+//! line is one `write` call of the sink, so two threads never interleave
+//! one line with another.
+//!
+//! `ANTI_LOGGER` names a file of the TOML subset that the first call
+//! reads. It holds `level`, `format` and `[[sink]]` entries with `kind`,
+//! `path` and `level`. A file that is missing or outside the subset
+//! writes one line to standard error, and the program goes on with the
+//! default, which is standard error at level `info` in text. A `log.set`
+//! in the program takes precedence over the file.
+
+import anti.error as failure;
+import anti.io;
+import anti.json;
+import anti.text;
+import anti.time;
+import anti.toml;
+
+extern fn getenv(name: *byte) -> *byte;
+extern fn fopen(path: *byte, mode: *byte) -> *byte;
+extern fn fclose(file: *byte) -> c_int;
+extern fn fwrite(bytes: *byte, size: c_size_t, count: c_size_t,
+	file: *byte) -> c_size_t;
+extern fn fflush(file: *byte) -> c_int;
+extern fn fseek(file: *byte, offset: c_long, whence: c_int) -> c_int;
+extern fn ftell(file: *byte) -> c_long;
+extern fn fread(into: *byte, size: c_size_t, count: c_size_t,
+	file: *byte) -> c_size_t;
+
+/// How much a logger writes, from everything to nothing but a failure.
+pub enum Level: u8 { Trace, Debug, Info, Warn, Error, Fatal, Off }
+
+/// The shape of a line.
+pub enum Format: u8 { Text, Json }
+
+/// Where the lines of a logger go.
+///
+/// A sink writes one whole line per call, with the newline at its end.
+pub abstract class Sink
+{
+	abstract fn write(self, line: str);
+}
+
+/// A sink that writes to standard error.
+pub class StderrSink
+{
+	inherits Sink,
+
+	/// A sink on standard error.
+	pub fn new() -> *StderrSink
+	{
+		return alloc StderrSink { };
+	}
+
+	concrete fn write(self, line: str)
+	{
+		io.eprint(line);
+	}
+}
+
+/// A sink that appends to a file.
+pub class FileSink
+{
+	inherits Sink,
+
+	file: *byte,
+
+	/// A sink that appends to the file at `path`.
+	///
+	/// A file that will not open gives an error with code 1.
+	pub fn new(path: str, out: **FileSink) -> *failure.Error
+	{
+		let file = fopen(path.ptr, "a".ptr);
+		if file == null {
+			return failure.Error.from_errno();
+		}
+		*out = alloc FileSink { file: file };
+		return null;
+	}
+
+	concrete fn write(self, line: str)
+	{
+		if self.file == null {
+			return;
+		}
+		fwrite(line.ptr, 1 as c_size_t, line.len as c_size_t, self.file);
+		fflush(self.file);
+	}
+
+	fn destruct(self)
+	{
+		if self.file != null {
+			fclose(self.file);
+			self.file = null;
+		}
+	}
+}
+
+/// A sink that hands each line to a function.
+pub class CallbackSink
+{
+	inherits Sink,
+
+	to: fn(str),
+
+	/// A sink that calls `to` with every line.
+	pub fn new(to: fn(str)) -> *CallbackSink
+	{
+		return alloc CallbackSink { to: to };
+	}
+
+	concrete fn write(self, line: str)
+	{
+		self.to(line);
+	}
+}
+
+/// A level, a sink, a format and a name.
+pub class Logger
+{
+	/// The name that every line of this logger carries.
+	pub name: str = "",
+	/// Lines below this level are dropped.
+	pub level: Level = Level.Info,
+	/// The shape of a line.
+	pub format: Format = Format.Text,
+	own sink: *Sink,
+
+	/// A logger with a name, a level and a sink it owns.
+	pub fn new(name: str, level: Level, sink: *Sink) -> *Logger
+	{
+		return alloc Logger { name: name, level: level,
+			format: Format.Text, sink: sink };
+	}
+
+	/// Write `message` at `level`, unless the logger drops that level.
+	pub fn log(self, level: Level, message: str)
+	{
+		if (level as int) < (self.level as int) || self.sink == null {
+			return;
+		}
+		let line = text.Builder.new();
+		if self.format == Format.Json {
+			line.append("{\"time\":");
+			json.write_int(time.wall(), &line);
+			line.append(",\"level\":");
+			json.write_text(level_name(level), &line);
+			line.append(",\"name\":");
+			json.write_text(self.name, &line);
+			line.append(",\"message\":");
+			json.write_text(message, &line);
+			line.append("}\n");
+		} else {
+			json.write_int(time.wall(), &line);
+			line.append(" ");
+			line.append(level_name(level));
+			line.append(" ");
+			if self.name.len != 0 {
+				line.append(self.name);
+				line.append(" ");
+			}
+			line.append(message);
+			line.append("\n");
+		}
+		self.sink.write(line.text());
+	}
+
+	/// Write `message` at the lowest level.
+	pub fn trace(self, message: str)
+	{
+		self.log(Level.Trace, message);
+	}
+
+	/// Write `message` at the level of a detail for a developer.
+	pub fn debug(self, message: str)
+	{
+		self.log(Level.Debug, message);
+	}
+
+	/// Write `message` at the level of ordinary progress.
+	pub fn info(self, message: str)
+	{
+		self.log(Level.Info, message);
+	}
+
+	/// Write `message` at the level of something to look at.
+	pub fn warn(self, message: str)
+	{
+		self.log(Level.Warn, message);
+	}
+
+	/// Write `message` at the level of a failure the program survived.
+	pub fn error(self, message: str)
+	{
+		self.log(Level.Error, message);
+	}
+
+	/// Write `message` at the level of a failure that ends the program.
+	pub fn fatal(self, message: str)
+	{
+		self.log(Level.Fatal, message);
+	}
+}
+
+/// The logger of the program.
+///
+/// The first call to `get` builds it, from `ANTI_LOGGER` when that names
+/// a file and from the default otherwise.
+pub singleton class Log
+{
+	atomic logger: *Logger = null,
+	atomic kinds: *Kind = null,
+
+	fn construct(self)
+	{
+		self.logger.store(from_environment());
+	}
+
+	/// The logger every function of the module writes through.
+	pub fn current(self) -> *Logger
+	{
+		return self.logger.load();
+	}
+}
+
+/// The logger the module writes through.
+pub fn logger() -> *Logger
+{
+	return Log.get().current();
+}
+
+/// Replace the logger of the program, and give back the one before it.
+///
+/// The caller owns the logger it gets back and deletes it when nothing
+/// else holds it.
+pub fn set(next: *Logger) -> *Logger
+{
+	return Log.get().logger.swap(next);
+}
+
+/// Write `message` at the lowest level.
+pub fn trace(message: str)
+{
+	logger().log(Level.Trace, message);
+}
+
+/// Write `message` at the level of a detail for a developer.
+pub fn debug(message: str)
+{
+	logger().log(Level.Debug, message);
+}
+
+/// Write `message` at the level of ordinary progress.
+pub fn info(message: str)
+{
+	logger().log(Level.Info, message);
+}
+
+/// Write `message` at the level of something to look at.
+pub fn warn(message: str)
+{
+	logger().log(Level.Warn, message);
+}
+
+/// Write `message` at the level of a failure the program survived.
+pub fn error(message: str)
+{
+	logger().log(Level.Error, message);
+}
+
+/// Write `message` at the level of a failure that ends the program.
+pub fn fatal(message: str)
+{
+	logger().log(Level.Fatal, message);
+}
+
+/// The name of `level` as the file and the lines spell it.
+pub fn level_name(level: Level) -> str
+{
+	if level == Level.Trace {
+		return "trace";
+	}
+	if level == Level.Debug {
+		return "debug";
+	}
+	if level == Level.Info {
+		return "info";
+	}
+	if level == Level.Warn {
+		return "warn";
+	}
+	if level == Level.Error {
+		return "error";
+	}
+	if level == Level.Fatal {
+		return "fatal";
+	}
+	return "off";
+}
+
+/// The level `name` spells, or `fallback` for any other text.
+pub fn level_of(name: str, fallback: Level) -> Level
+{
+	if text.equal(name, "trace") {
+		return Level.Trace;
+	}
+	if text.equal(name, "debug") {
+		return Level.Debug;
+	}
+	if text.equal(name, "info") {
+		return Level.Info;
+	}
+	if text.equal(name, "warn") {
+		return Level.Warn;
+	}
+	if text.equal(name, "error") {
+		return Level.Error;
+	}
+	if text.equal(name, "fatal") {
+		return Level.Fatal;
+	}
+	if text.equal(name, "off") {
+		return Level.Off;
+	}
+	return fallback;
+}
+
+/// One kind of sink a configuration file may name.
+class Kind
+{
+	pub name: str = "",
+	pub make: fn(str) -> *Sink,
+	pub next: *Kind,
+}
+
+/// Add a kind of sink that a configuration file may name.
+///
+/// `make` takes the `path` of the entry and gives the sink. A file that
+/// names a kind nothing registered writes one line to standard error and
+/// the entry is left out. The kinds `stderr` and `file` are always there.
+pub fn register(name: str, make: fn(str) -> *Sink)
+{
+	let one = alloc Kind { name: name, make: make, next: null };
+	while true do {
+		one.next = Log.get().kinds.load();
+		if Log.get().kinds.compare_swap(one.next, one) {
+			return;
+		}
+	}
+}
+
+/// The sink of the kind `name`, or null.
+fn made(name: str, path: str) -> *Sink
+{
+	if text.equal(name, "stderr") {
+		return StderrSink.new();
+	}
+	if text.equal(name, "file") {
+		let sink = FileSink.new(path) catch e {
+			io.eprint("anti.log: ");
+			io.eprint(e.message);
+			io.eprint("\n");
+			yield null;
+		};
+		return sink;
+	}
+	let one = Log.get().kinds.load();
+	while one != null do {
+		if text.equal(one.name, name) {
+			return one.make(path);
+		}
+		one = one.next;
+	}
+	return null;
+}
+
+/// The logger the environment asks for, or the default one.
+fn from_environment() -> *Logger
+{
+	let path = getenv("ANTI_LOGGER".ptr);
+	if path == null {
+		return Logger.new("", Level.Info, StderrSink.new());
+	}
+	let source = read_file(text.from_c(path)) catch e {
+		io.eprint("anti.log: ");
+		io.eprint(e.message);
+		io.eprint("\n");
+		yield "";
+	};
+	if source.len == 0 {
+		return Logger.new("", Level.Info, StderrSink.new());
+	}
+	let doc = toml.Document.read(source) catch e {
+		io.eprint("anti.log: ");
+		io.eprint(e.message);
+		io.eprint("\n");
+		return Logger.new("", Level.Info, StderrSink.new());
+	};
+	let level = level_of(doc.text_of("level", "info"), Level.Info);
+	let logger = Logger.new(doc.text_of("name", ""), level, first_sink(&doc));
+	if text.equal(doc.text_of("format", "text"), "json") {
+		logger.format = Format.Json;
+	}
+	return logger;
+}
+
+/// The sink of the first `[[sink]]` entry, or standard error.
+fn first_sink(doc: *toml.Document) -> *Sink
+{
+	let i = 0;
+	while i < 8 do {
+		let key = text.Builder.new();
+		key.append("sink.");
+		json.write_int(i, &key);
+		key.append(".kind");
+		if !doc.has(key.text()) {
+			i += 1;
+			continue;
+		}
+		let kind = doc.text_of(key.text(), "stderr");
+		let where = text.Builder.new();
+		where.append("sink.");
+		json.write_int(i, &where);
+		where.append(".path");
+		let sink = made(kind, doc.text_of(where.text(), ""));
+		if sink != null {
+			return sink;
+		}
+		io.eprint("anti.log: no sink of kind ");
+		io.eprint(kind);
+		io.eprint("\n");
+		i += 1;
+	}
+	return StderrSink.new();
+}
+
+/// The bytes of the file at `path`.
+fn read_file(path: str, out: *str) -> *failure.Error
+{
+	let file = fopen(path.ptr, "rb".ptr);
+	if file == null {
+		return failure.Error.from_errno();
+	}
+	fseek(file, 0 as c_long, 2 as c_int);
+	let size = ftell(file) as int;
+	fseek(file, 0 as c_long, 0 as c_int);
+	if size <= 0 {
+		fclose(file);
+		*out = "";
+		return null;
+	}
+	let room = alloc(byte, size + 1);
+	let read = fread(room, 1 as c_size_t, size as c_size_t, file) as int;
+	fclose(file);
+	room[read] = 0;
+	*out = text.from_c(room);
+	return null;
+}

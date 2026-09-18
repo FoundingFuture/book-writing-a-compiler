@@ -1,0 +1,4 @@
+visibility.anti:45:5: error: `r` is private to `Circle`
+visibility.anti:48:2: error: `recompute` is protected in `Shape`
+visibility.anti:49:5: error: `guard` is protected in `Shape`
+visibility.anti:52:5: error: `helper` is private to `Counter`

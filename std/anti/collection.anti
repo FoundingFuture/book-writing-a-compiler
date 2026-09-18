@@ -1,0 +1,316 @@
+//! A list and two maps over objects.
+//!
+//! Anti has no generics, so a collection holds `*anti.rt.Object` and the
+//! program casts what it takes out with `as` or `as?`. Every class
+//! descends from that root, so any object goes in. A collection owns its
+//! own memory and never the objects, which the program still deletes.
+
+import anti.text;
+
+extern fn memcpy(to: *byte, from: *byte, count: c_size_t) -> *byte;
+
+/// A growing array of objects.
+pub class List
+{
+	own items: []*Object,
+	count: int = 0,
+
+	/// An empty list.
+	pub fn new() -> List
+	{
+		return List { items: []*Object { ptr: null, len: 0 }, count: 0 };
+	}
+
+	/// The number of objects in the list.
+	pub fn len(self) -> int
+	{
+		return self.count;
+	}
+
+	/// Add `value` to the end.
+	pub fn push(self, value: *Object)
+	{
+		self.reserve(self.count + 1);
+		self.items[self.count] = value;
+		self.count = self.count + 1;
+	}
+
+	/// The object at `index`, or null outside the list.
+	pub fn at(self, index: int) -> *Object
+	{
+		if index < 0 || index >= self.count {
+			return null;
+		}
+		return self.items[index];
+	}
+
+	/// Write `value` at `index`, which must be inside the list.
+	pub fn set(self, index: int, value: *Object)
+	{
+		if index < 0 || index >= self.count {
+			return;
+		}
+		self.items[index] = value;
+	}
+
+	/// Take the last object off the end, or null when the list is empty.
+	pub fn pop(self) -> *Object
+	{
+		if self.count == 0 {
+			return null;
+		}
+		self.count = self.count - 1;
+		return self.items[self.count];
+	}
+
+	/// Forget every object without deleting one.
+	pub fn clear(self)
+	{
+		self.count = 0;
+	}
+
+	/// Make room for `wanted` objects.
+	fn reserve(self, wanted: int)
+	{
+		if wanted <= self.items.len {
+			return;
+		}
+		let size = self.items.len;
+		if size == 0 {
+			size = 8;
+		}
+		while size < wanted do {
+			size = size * 2;
+		}
+		let room = alloc(*Object, size);
+		if self.items.ptr != null {
+			memcpy(room as *byte, self.items.ptr as *byte,
+				(self.count * size_of(*Object)) as c_size_t);
+			free(self.items.ptr);
+		}
+		self.items = []*Object { ptr: room, len: size };
+	}
+}
+
+/// One entry of a map, which the map owns.
+class Entry
+{
+	pub key: str = "",
+	pub number: int = 0,
+	pub value: *Object,
+	pub own next: *Entry,
+}
+
+/// A map from `str` keys to objects.
+///
+/// The keys are compared by their bytes, and the map keeps the `str` it
+/// was given rather than a copy of the bytes.
+pub class Map
+{
+	own buckets: []*Entry,
+	count: int = 0,
+
+	/// An empty map.
+	pub fn new() -> Map
+	{
+		return Map { buckets: []*Entry { ptr: null, len: 0 }, count: 0 };
+	}
+
+	/// The number of entries.
+	pub fn len(self) -> int
+	{
+		return self.count;
+	}
+
+	/// Write `value` under `key`, replacing what was there.
+	pub fn set(self, key: str, value: *Object)
+	{
+		self.grow();
+		let at = hash_text(key) % (self.buckets.len as u64);
+		let e = self.buckets[at as int];
+		while e != null do {
+			if text.equal(e.key, key) {
+				e.value = value;
+				return;
+			}
+			e = e.next;
+		}
+		let made = alloc Entry { key: key, value: value,
+			next: self.buckets[at as int] };
+		self.buckets[at as int] = made;
+		self.count = self.count + 1;
+	}
+
+	/// The object under `key`, or null when the map has none.
+	pub fn get(self, key: str) -> *Object
+	{
+		if self.buckets.len == 0 {
+			return null;
+		}
+		let at = hash_text(key) % (self.buckets.len as u64);
+		let e = self.buckets[at as int];
+		while e != null do {
+			if text.equal(e.key, key) {
+				return e.value;
+			}
+			e = e.next;
+		}
+		return null;
+	}
+
+	/// Whether the map holds `key`.
+	pub fn has(self, key: str) -> bool
+	{
+		return self.get(key) != null;
+	}
+
+	/// Double the buckets when the map is half full.
+	fn grow(self)
+	{
+		if self.buckets.len != 0 && self.count * 2 < self.buckets.len {
+			return;
+		}
+		let size = self.buckets.len * 2;
+		if size == 0 {
+			size = 16;
+		}
+		let room = alloc(*Entry, size);
+		let i = 0;
+		while i < size do {
+			room[i] = null;
+			i += 1;
+		}
+		i = 0;
+		while i < self.buckets.len do {
+			let e = self.buckets[i];
+			while e != null do {
+				let after = e.next;
+				let at = (hash_text(e.key) % (size as u64)) as int;
+				e.next = room[at];
+				room[at] = e;
+				e = after;
+			}
+			i += 1;
+		}
+		if self.buckets.ptr != null {
+			free(self.buckets.ptr);
+		}
+		self.buckets = []*Entry { ptr: room, len: size };
+	}
+}
+
+/// A map from integer keys to objects.
+pub class IntMap
+{
+	own buckets: []*Entry,
+	count: int = 0,
+
+	/// An empty map.
+	pub fn new() -> IntMap
+	{
+		return IntMap { buckets: []*Entry { ptr: null, len: 0 }, count: 0 };
+	}
+
+	/// The number of entries.
+	pub fn len(self) -> int
+	{
+		return self.count;
+	}
+
+	/// Write `value` under `key`, replacing what was there.
+	pub fn set(self, key: int, value: *Object)
+	{
+		self.grow();
+		let at = (hash_int(key) % (self.buckets.len as u64)) as int;
+		let e = self.buckets[at];
+		while e != null do {
+			if e.number == key {
+				e.value = value;
+				return;
+			}
+			e = e.next;
+		}
+		let made = alloc Entry { number: key, value: value,
+			next: self.buckets[at] };
+		self.buckets[at] = made;
+		self.count = self.count + 1;
+	}
+
+	/// The object under `key`, or null when the map has none.
+	pub fn get(self, key: int) -> *Object
+	{
+		if self.buckets.len == 0 {
+			return null;
+		}
+		let at = (hash_int(key) % (self.buckets.len as u64)) as int;
+		let e = self.buckets[at];
+		while e != null do {
+			if e.number == key {
+				return e.value;
+			}
+			e = e.next;
+		}
+		return null;
+	}
+
+	/// Whether the map holds `key`.
+	pub fn has(self, key: int) -> bool
+	{
+		return self.get(key) != null;
+	}
+
+	/// Double the buckets when the map is half full.
+	fn grow(self)
+	{
+		if self.buckets.len != 0 && self.count * 2 < self.buckets.len {
+			return;
+		}
+		let size = self.buckets.len * 2;
+		if size == 0 {
+			size = 16;
+		}
+		let room = alloc(*Entry, size);
+		let i = 0;
+		while i < size do {
+			room[i] = null;
+			i += 1;
+		}
+		i = 0;
+		while i < self.buckets.len do {
+			let e = self.buckets[i];
+			while e != null do {
+				let after = e.next;
+				let at = (hash_int(e.number) % (size as u64)) as int;
+				e.next = room[at];
+				room[at] = e;
+				e = after;
+			}
+			i += 1;
+		}
+		if self.buckets.ptr != null {
+			free(self.buckets.ptr);
+		}
+		self.buckets = []*Entry { ptr: room, len: size };
+	}
+}
+
+/// FNV-1a over the bytes of `s`, which is what the runtime hashes with.
+fn hash_text(s: str) -> u64
+{
+	let h: u64 = 0xCBF29CE484222325;
+	let i = 0;
+	while i < s.len do {
+		h = (h ^ (s[i] as u64)) * 0x100000001B3;
+		i += 1;
+	}
+	return h;
+}
+
+/// A mix that spreads the low bits of a small key over the whole word.
+fn hash_int(key: int) -> u64
+{
+	let z: u64 = (key as u64) + 0x9E3779B97F4A7C15;
+	z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9;
+	z = (z ^ (z >> 27)) * 0x94D049BB133111EB;
+	return z ^ (z >> 31);
+}

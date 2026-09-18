@@ -1,0 +1,53 @@
+//! `construct` runs after a literal, base first down the chain, and a
+//! local of a class that owns memory or declares `destruct` is torn
+//! down at the end of its block.
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+class Base
+{
+	pub n: int = 0,
+
+	fn construct(self)
+	{
+		self.n = self.n + 1;
+		printf("base %d\n".ptr, self.n as c_int);
+	}
+
+	fn destruct(self)
+	{
+		printf("base out %d\n".ptr, self.n as c_int);
+	}
+}
+
+class Derived
+{
+	inherits Base,
+	pub m: int = 10,
+
+	fn construct(self)
+	{
+		self.m = self.m + self.n;
+		printf("derived %d\n".ptr, self.m as c_int);
+	}
+
+	fn destruct(self)
+	{
+		printf("derived out %d\n".ptr, self.m as c_int);
+	}
+}
+
+fn scope()
+{
+	let d = Derived { };
+	printf("inside %d %d\n".ptr, d.n as c_int, d.m as c_int);
+}
+
+fn main() -> int
+{
+	scope();
+	printf("after\n".ptr);
+	let heap = alloc Derived { n: 5 };
+	printf("heap %d %d\n".ptr, heap.n as c_int, heap.m as c_int);
+	delete(heap);
+	return 0;
+}

@@ -1,0 +1,79 @@
+//! A list and two maps hold objects. Anti has no generics, so a
+//! collection holds the root class and the program casts what it takes
+//! out.
+import anti.collection;
+import anti.io;
+
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+class Item
+{
+	pub n: int = 0,
+}
+
+fn main() -> int
+{
+	let list = collection.List.new();
+	let i = 0;
+	while i < 100 do {
+		list.push((alloc Item { n: i }) as *Object);
+		i += 1;
+	}
+	if list.len() != 100 {
+		return 1;
+	}
+	let third = list.at(3) as *Item;
+	if third.n != 3 {
+		return 2;
+	}
+	if list.at(100) != null {
+		return 3;
+	}
+	let last = list.pop() as *Item;
+	if last.n != 99 || list.len() != 99 {
+		return 4;
+	}
+
+	let map = collection.Map.new();
+	map.set("one", list.at(1));
+	map.set("two", list.at(2));
+	map.set("one", list.at(5));
+	if map.len() != 2 {
+		return 5;
+	}
+	let under = map.get("one") as *Item;
+	if under.n != 5 {
+		return 6;
+	}
+	if map.has("three") {
+		return 7;
+	}
+
+	let numbers = collection.IntMap.new();
+	i = 0;
+	while i < 50 do {
+		numbers.set(i * 7, list.at(i));
+		i += 1;
+	}
+	if numbers.len() != 50 {
+		return 8;
+	}
+	let found = numbers.get(21) as *Item;
+	if found.n != 3 {
+		return 9;
+	}
+	if numbers.get(22) != null {
+		return 10;
+	}
+
+	printf("%d %d %d\n".ptr, list.len() as c_int, map.len() as c_int,
+		numbers.len() as c_int);
+	i = 0;
+	while i < list.len() do {
+		delete(list.at(i));
+		i += 1;
+	}
+	delete(last as *Object);
+	io.println("done");
+	return 0;
+}

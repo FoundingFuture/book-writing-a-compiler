@@ -1,0 +1,36 @@
+sizes.main:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $16, %rsp
+    leaq (%rsp), %rax
+    movq $0, %rcx
+b1:
+    cmpq $16, %rcx
+    jge b3
+b2:
+    movb $1, (%rax,%rcx,1)
+    addq $1, %rcx
+    jmp b1
+b3:
+    movq $0, %rdx
+    movq $0, %rcx
+b4:
+    cmpq $16, %rcx
+    jge b6
+b5:
+    movb (%rax,%rcx,1), %sil
+    movzbq %sil, %rsi
+    addq %rsi, %rdx
+    addq $1, %rcx
+    jmp b4
+b6:
+    leaq sizes.0(%rip), %rdi
+    movq $16, %rsi
+    movq $24, %rcx
+    movl $0, %eax
+    call printf
+    movq $0, %rax
+    movq %rbp, %rsp
+    popq %rbp
+    ret

@@ -1,0 +1,107 @@
+//! A seedable source of pseudorandom numbers.
+//!
+//! `Random` is a class, so a program holds one per thread or one per
+//! task and never shares a hidden global. The generator is xoshiro256**,
+//! which passes the usual statistical tests and needs eight words of
+//! state. It is not a cryptographic generator, and `anti.crypto` will
+//! hold one of those.
+
+/// A stream of pseudorandom numbers from one seed.
+pub class Random
+{
+	s0: u64 = 0,
+	s1: u64 = 0,
+	s2: u64 = 0,
+	s3: u64 = 0,
+
+	/// A generator seeded with `seed`.
+	///
+	/// One seed gives one sequence, on every target and in every build.
+	pub fn new(seed: u64) -> Random
+	{
+		let r = Random { };
+		r.reseed(seed);
+		return r;
+	}
+
+	/// Start the sequence again from `seed`.
+	pub fn reseed(self, seed: u64)
+	{
+		/* SplitMix64 spreads one word over the four the generator
+		   holds, so a seed of 0 or 1 still starts a full sequence. */
+		let x = seed;
+		self.s0 = self.split(&x);
+		self.s1 = self.split(&x);
+		self.s2 = self.split(&x);
+		self.s3 = self.split(&x);
+	}
+
+	/// The next number, which uses the whole range of `u64`.
+	pub fn next(self) -> u64
+	{
+		let result = rotate(self.s1 * 5, 7) * 9;
+		let t = self.s1 << 17;
+		self.s2 = self.s2 ^ self.s0;
+		self.s3 = self.s3 ^ self.s1;
+		self.s1 = self.s1 ^ self.s2;
+		self.s0 = self.s0 ^ self.s3;
+		self.s2 = self.s2 ^ t;
+		self.s3 = rotate(self.s3, 45);
+		return result;
+	}
+
+	/// The next number from 0 up to but not including `limit`.
+	///
+	/// A `limit` of 0 gives 0. The result is unbiased, because a draw
+	/// that falls in the short tail of the range is taken again.
+	pub fn below(self, limit: u64) -> u64
+	{
+		if limit == 0 {
+			return 0;
+		}
+		let edge = 0xFFFFFFFFFFFFFFFF - (0xFFFFFFFFFFFFFFFF % limit);
+		let draw = self.next();
+		while draw >= edge do {
+			draw = self.next();
+		}
+		return draw % limit;
+	}
+
+	/// The next number from `low` up to but not including `high`.
+	pub fn between(self, low: int, high: int) -> int
+	{
+		if high <= low {
+			return low;
+		}
+		return low + self.below((high - low) as u64) as int;
+	}
+
+	/// The next `bool`, true half the time.
+	pub fn boolean(self) -> bool
+	{
+		return (self.next() >> 63) == 1;
+	}
+
+	/// The next `f64` from 0.0 up to but not including 1.0.
+	pub fn fraction(self) -> f64
+	{
+		/* The top 53 bits are the ones a f64 holds without loss. */
+		return (self.next() >> 11) as f64 * 0.00000000000000011102230246251565;
+	}
+
+	/// One step of SplitMix64 over the word at `state`.
+	fn split(self, state: *u64) -> u64
+	{
+		*state = *state + 0x9E3779B97F4A7C15;
+		let z = *state;
+		z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9;
+		z = (z ^ (z >> 27)) * 0x94D049BB133111EB;
+		return z ^ (z >> 31);
+	}
+}
+
+/// `x` rotated left by `n` bits.
+fn rotate(x: u64, n: u64) -> u64
+{
+	return (x << n) | (x >> (64 - n));
+}

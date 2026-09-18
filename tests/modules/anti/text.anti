@@ -1,0 +1,4 @@
+pub fn equal(a: str, b: str) -> bool
+{
+	return a.len == b.len;
+}

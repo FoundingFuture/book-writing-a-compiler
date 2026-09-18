@@ -1,0 +1,7 @@
+-v
+--output=build/anti
+--jobs
+8
+one
+--
+-two

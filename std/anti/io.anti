@@ -1,0 +1,39 @@
+//! Console output and the exit code of a program.
+//!
+//! The functions write the bytes of a `str` unchanged to standard output or
+//! standard error, through the same C streams as `printf`.
+
+extern fn anti_rt_write(stream: c_int, bytes: *byte, count: c_size_t);
+extern fn anti_rt_exit(status: c_int);
+
+/// Write `text` to standard output.
+pub fn print(text: str)
+{
+	anti_rt_write(1, text.ptr, text.len as c_size_t);
+}
+
+/// Write `text` and a newline to standard output.
+pub fn println(text: str)
+{
+	print(text);
+	print("\n");
+}
+
+/// Write `text` to standard error.
+pub fn eprint(text: str)
+{
+	anti_rt_write(2, text.ptr, text.len as c_size_t);
+}
+
+/// Write `text` and a newline to standard error.
+pub fn eprintln(text: str)
+{
+	eprint(text);
+	eprint("\n");
+}
+
+/// End the program with the exit code `status` after flushing both streams.
+pub fn exit(status: int)
+{
+	anti_rt_exit(status as c_int);
+}

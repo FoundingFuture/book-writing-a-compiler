@@ -1,0 +1,80 @@
+Format: COFF-ARM64
+Arch: aarch64
+AddressSize: 64bit
+UnwindInformation [
+  RuntimeFunction {
+    Function: _A6unwind_spin (0x0)
+    ExceptionRecord: .xdata (0x0)
+    ExceptionData {
+      FunctionLength: 292
+      Version: 0
+      ExceptionData: No
+      EpiloguePacked: No
+      EpilogueScopes: 2
+      ByteCodeLength: 36
+      Prologue [
+        0xe206              ; add fp, sp, #48
+        0xdc00              ; str d8, [sp, #0]
+        0xd101              ; str x23, [sp, #8]
+        0xd0c2              ; str x22, [sp, #16]
+        0xd083              ; str x21, [sp, #24]
+        0xd044              ; str x20, [sp, #32]
+        0xd005              ; str x19, [sp, #40]
+        0x03                ; sub sp, #48
+        0x81                ; stp x29, x30, [sp, #-16]!
+        0xe4                ; end
+      ]
+      EpilogueScopes [
+        EpilogueScope {
+          StartOffset: 30
+          EpilogueStartIndex: 17
+          Opcodes [
+            0xe3                ; nop
+            0xc139              ; add sp, #5008
+            0xd005              ; ldr x19, [sp, #40]
+            0xd044              ; ldr x20, [sp, #32]
+            0xd083              ; ldr x21, [sp, #24]
+            0xd0c2              ; ldr x22, [sp, #16]
+            0xd101              ; ldr x23, [sp, #8]
+            0xdc00              ; ldr d8, [sp, #0]
+            0x03                ; add sp, #48
+            0x81                ; ldp x29, x30, [sp], #16
+            0xe4                ; end
+          ]
+        }
+        EpilogueScope {
+          StartOffset: 62
+          EpilogueStartIndex: 17
+          Opcodes [
+            0xe3                ; nop
+            0xc139              ; add sp, #5008
+            0xd005              ; ldr x19, [sp, #40]
+            0xd044              ; ldr x20, [sp, #32]
+            0xd083              ; ldr x21, [sp, #24]
+            0xd0c2              ; ldr x22, [sp, #16]
+            0xd101              ; ldr x23, [sp, #8]
+            0xdc00              ; ldr d8, [sp, #0]
+            0x03                ; add sp, #48
+            0x81                ; ldp x29, x30, [sp], #16
+            0xe4                ; end
+          ]
+        }
+      ]
+    }
+  }
+  RuntimeFunction {
+    Function: _A4anti2rt_main (0x124)
+    Fragment: No
+    FunctionLength: 32
+    RegF: 0
+    RegI: 0
+    HomedParameters: No
+    CR: 3
+    FrameSize: 16
+    Prologue [
+      mov x29, sp
+      stp x29, lr, [sp, #-16]!
+      end
+    ]
+  }
+]

@@ -1,0 +1,69 @@
+//! Plane geometry for C programs.
+
+/// A point on the plane.
+export struct Vec2
+{
+	x: c_int,
+	y: c_int,
+}
+
+/// An integer or a float in 8 bytes.
+export union Num
+{
+	i: i64,
+	d: f64,
+}
+
+/// Display flags.
+export struct Flags
+{
+	visible: u32 : 1,
+	layer: u32 : 4,
+}
+
+/// The largest layer.
+export const LAYERS: int = 16;
+
+extern fn anti_rt_ready() -> c_int;
+
+fn square(v: c_int) -> c_int
+{
+	return v * v;
+}
+
+/// The dot product of a and b.
+export fn geo_dot(a: Vec2, b: Vec2) -> c_int
+{
+	return a.x * b.x + a.y * b.y;
+}
+
+/// v with both coordinates multiplied by k.
+export fn geo_scale(v: Vec2, k: c_int) -> Vec2
+{
+	return Vec2 { x: v.x * k, y: v.y * k };
+}
+
+/// Half of the float in n.
+export fn geo_half(n: Num) -> Num
+{
+	return Num { d: n.d / 2.0 };
+}
+
+/// The layer of the flags at f, with visible set.
+export fn geo_layer(f: *Flags) -> u32
+{
+	f.visible = 1;
+	return f.layer;
+}
+
+/// The squared length of v, through a function pointer.
+export fn geo_apply(f: fn(c_int) -> c_int, v: Vec2) -> c_int
+{
+	return f(v.x) + f(v.y) + square(0);
+}
+
+/// 1 once the runtime is initialised.
+export fn geo_ready() -> c_int
+{
+	return anti_rt_ready();
+}

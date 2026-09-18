@@ -1,0 +1,71 @@
+//! The loop forms of the core: a range with and without a binding, a
+//! slice by value and by pointer, and `by` with a positive and a
+//! negative step. A negative step walks the same values backwards.
+import anti.io;
+
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+fn line(label: str, n: int)
+{
+	printf("%s %d\n".ptr, label.ptr, n as c_int);
+}
+
+fn main() -> int
+{
+	let sum = 0;
+	for i in 0..5 {
+		sum = sum + i;
+	}
+	line("range", sum);
+
+	let count = 0;
+	for 0..3 {
+		count = count + 1;
+	}
+	line("unbound", count);
+
+	let room = alloc([4]int, 1);
+	(*room)[0] = 2;
+	(*room)[1] = 3;
+	(*room)[2] = 5;
+	(*room)[3] = 7;
+	let values = (*room)[0..4];
+	let product = 1;
+	for v in values {
+		product = product * v;
+	}
+	line("slice", product);
+
+	let doubled = 0;
+	for v in &values {
+		doubled = doubled + *v;
+	}
+	line("pointer", doubled);
+
+	let up = 0;
+	for i in 0..10 by 3 {
+		up = up * 10 + i;
+	}
+	line("up", up);
+
+	let down = 0;
+	for i in 0..10 by -3 {
+		down = down * 10 + i;
+	}
+	line("down", down);
+
+	let one = 0;
+	for i in 4..5 by -1 {
+		one = one + i;
+	}
+	line("one", one);
+
+	let none_ = 0;
+	for i in 5..5 by -2 {
+		none_ = none_ + 1;
+	}
+	line("empty", none_);
+
+	free(room);
+	return 0;
+}

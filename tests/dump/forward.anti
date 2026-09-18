@@ -1,0 +1,20 @@
+//! A method body that reads one field twice. Store-to-load forwarding
+//! turns the second load into a use of the first, and copy propagation
+//! removes the copy it leaves.
+
+struct Point
+{
+	x: int,
+	y: int,
+}
+
+pub fn twice(p: *Point) -> int
+{
+	return p.y + p.y;
+}
+
+pub fn round_trip(p: *Point, n: int) -> int
+{
+	p.x = n;
+	return p.x + p.x;
+}

@@ -1,0 +1,35 @@
+import anti.error;
+
+fn risky(out: *int) -> *error.Error
+{
+	*out = 1;
+	return null;
+}
+
+fn quiet() -> int
+{
+	risky();
+	return 0;
+}
+
+fn keeper() -> int
+{
+	let kept = risky() catch e {
+		yield 1;
+	};
+	let escaped = risky() catch e {
+		let mine = e;
+		yield 2;
+	};
+	return kept + escaped;
+}
+
+fn no_place() -> int
+{
+	yield 3;
+}
+
+fn main() -> int
+{
+	return quiet() + keeper() + no_place();
+}

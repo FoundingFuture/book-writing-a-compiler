@@ -1,0 +1,11 @@
+exit 0
+name = antic
+threads = 4
+quiet = false
+limits.depth = 32
+sink.0.kind = stderr
+sink.1.kind = file
+sink.1.path = /tmp/anti.log
+/tmp/anti.log
+none
+the text is not the TOML subset

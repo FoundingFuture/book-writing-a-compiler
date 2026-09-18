@@ -1,0 +1,10 @@
+//! A program whose assertion fails. A release build runs it to its end
+//! and exits with 7. A build with assertions prints the failure and
+//! aborts. The test `asserts` runs both.
+
+fn main() -> int
+{
+	let n = 0;
+	assert(n > 0);
+	return 7;
+}

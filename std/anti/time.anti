@@ -1,0 +1,83 @@
+//! Clocks and durations.
+//!
+//! A `Duration` is a count of nanoseconds. The monotonic clock measures a
+//! duration and never moves backwards. The wall clock gives a date and may
+//! move either way when the machine corrects itself.
+
+extern fn anti_rt_monotonic() -> int;
+extern fn anti_rt_wall() -> int;
+extern fn anti_rt_sleep(nanoseconds: int);
+
+/// A span of time in nanoseconds.
+pub struct Duration
+{
+	/// The span, which may be negative.
+	nanoseconds: int,
+}
+
+/// A duration of n nanoseconds.
+pub fn nanoseconds(n: int) -> Duration
+{
+	return Duration { nanoseconds: n };
+}
+
+/// A duration of n microseconds.
+pub fn microseconds(n: int) -> Duration
+{
+	return Duration { nanoseconds: n * 1000 };
+}
+
+/// A duration of n milliseconds.
+pub fn milliseconds(n: int) -> Duration
+{
+	return Duration { nanoseconds: n * 1000000 };
+}
+
+/// A duration of n seconds.
+pub fn seconds(n: int) -> Duration
+{
+	return Duration { nanoseconds: n * 1000000000 };
+}
+
+/// The whole milliseconds of d, rounded towards zero.
+pub fn as_milliseconds(d: Duration) -> int
+{
+	return d.nanoseconds / 1000000;
+}
+
+/// The whole seconds of d, rounded towards zero.
+pub fn as_seconds(d: Duration) -> int
+{
+	return d.nanoseconds / 1000000000;
+}
+
+/// The sum of two durations.
+pub fn add(a: Duration, b: Duration) -> Duration
+{
+	return Duration { nanoseconds: a.nanoseconds + b.nanoseconds };
+}
+
+/// The time from b to a.
+pub fn between(a: int, b: int) -> Duration
+{
+	return Duration { nanoseconds: a - b };
+}
+
+/// A reading of the monotonic clock, in nanoseconds. Its zero has no
+/// meaning, so two readings are only ever subtracted.
+pub fn now() -> int
+{
+	return anti_rt_monotonic();
+}
+
+/// Nanoseconds since 1970-01-01T00:00:00Z.
+pub fn wall() -> int
+{
+	return anti_rt_wall();
+}
+
+/// Wait for d. A duration that is not positive returns at once.
+pub fn sleep(d: Duration)
+{
+	anti_rt_sleep(d.nanoseconds);
+}

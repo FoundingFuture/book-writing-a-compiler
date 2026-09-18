@@ -1,0 +1,188 @@
+//! The example of docs/anti-object-model.md, which uses every part
+//! of the object model at once.
+import anti.io;
+import anti.text;
+import anti.error;
+
+const PI: f32 = 3.14159;
+
+enum Kind: u8 { Circle, Square }
+
+struct Rect
+{
+	x: f32,
+	y: f32,
+	w: f32,
+	h: f32,
+}
+
+abstract class Drawable
+{
+	abstract fn draw(self);
+}
+
+abstract class Serializable
+{
+	abstract fn serialize(self, out: *text.Builder);
+}
+
+abstract class Shape
+{
+	inherits Drawable,
+
+	pub kind: Kind,
+	pub x: f32 = 0.0,
+	pub y: f32 = 0.0,
+
+	const MAX_SIDE: f32 = 1000.0;
+	static atomic count: int = 0;
+
+	abstract fn area(self) -> f32;
+
+	fn construct(self)
+	{
+		Shape.count.add(1);
+	}
+
+	pub fn move(self, dx: f32, dy: f32)
+	{
+		self.x = self.x + dx;
+		self.y = self.y + dy;
+	}
+
+	pub fn describe(self) -> str
+	{
+		return self.type_name();
+	}
+}
+
+final class Circle
+{
+	inherits Shape,
+	implements ser: Serializable,
+
+	r: f32,
+
+	fn construct(self, r: f32) -> *error.Error
+	{
+		if r <= 0.0 {
+			return error.Error.new(1, "radius must be positive");
+		}
+		self.r = r;
+		return null;
+	}
+
+	concrete fn area(self) -> f32
+	{
+		return PI * self.r * self.r;
+	}
+
+	concrete fn draw(self)
+	{
+		io.println("circle");
+	}
+
+	concrete fn Serializable::serialize(self, out: *text.Builder)
+	{
+		out.append("circle");
+	}
+}
+
+class Square
+{
+	inherits Shape,
+
+	side: f32,
+	own label: []byte,
+
+	pub fn new(side: f32) -> Square
+	{
+		let buf = []byte { ptr: alloc(byte, 8), len: 8 };
+		return Square { kind: Kind.Square, side: side, label: buf };
+	}
+
+	concrete fn area(self) -> f32
+	{
+		return self.side * self.side;
+	}
+
+	concrete fn draw(self)
+	{
+		io.println("square");
+	}
+
+	concrete fn describe(self) -> str
+	{
+		self.clamp();
+		return self.super.describe();
+	}
+
+	fn clamp(self)
+	{
+		if self.side > Shape.MAX_SIDE {
+			self.side = Shape.MAX_SIDE;
+		}
+	}
+}
+
+class Sprite
+{
+	use rect: Rect,
+	pub texture: int,
+}
+
+class Vec2
+{
+	pub x: f32,
+	pub y: f32,
+
+	operator fn add(self, o: Vec2) -> Vec2
+	{
+		return Vec2 { x: self.x + o.x, y: self.y + o.y };
+	}
+}
+
+singleton class Config
+{
+	path: str = "config.toml",
+	atomic requests: int = 0,
+	mutable title: str = "untitled",
+}
+
+fn total(shapes: []*Shape) -> f32
+{
+	let sum: f32 = 0.0;
+	for s in shapes {
+		sum = sum + s.area();
+		s.draw();
+	}
+	return sum;
+}
+
+fn main() -> int
+{
+	let c = alloc Circle(2.0) catch fatal;
+	defer delete(c);
+	let s = Square.new(3.0);
+	c.move(1.0, 1.0);
+	let shapes: [2]*Shape = [c, &s];
+	let t = total(shapes[0..2]);
+	if shapes[1] is *Square {
+		let q = shapes[1] as *Square;
+		io.println(q.describe());
+	}
+	let copy = dup(c);
+	let f = c.area;
+	let a = f();
+	assert(a > 12.0);
+	delete(copy);
+	let ser = c as *Serializable;
+	let b = text.Builder.new();
+	ser.serialize(&b);
+	let sp = Sprite { rect: Rect { x: 0.0, y: 0.0, w: 8.0, h: 8.0 }, texture: 7 };
+	sp.x = 4.0;
+	let v = Vec2 { x: 1.0, y: 2.0 } + Vec2 { x: 3.0, y: 4.0 };
+	Config.get().requests.add(1);
+	io.println(Config.get().title);
+	return 0;
+}

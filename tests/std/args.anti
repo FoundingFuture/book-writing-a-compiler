@@ -1,0 +1,43 @@
+//! A declared command line reads a flag, a value in three forms and the
+//! arguments that are no option, and writes its own help text.
+import anti.args;
+import anti.io;
+import anti.text;
+
+fn main(argv: []str, env: []str) -> int
+{
+	let p = args.Parser.new("pin", "pin a version of a package");
+	p.flag("verbose", 0x76, "write more about what happens");
+	p.value("output", 0x6F, "the file to write", "a.out");
+	p.value("jobs", 0x6A, "how many jobs run at once", "1");
+	p.parse(argv) catch e {
+		io.println(e.message);
+		return 1;
+	};
+
+	if !p.given("verbose") {
+		return 2;
+	}
+	if p.given("help") {
+		return 3;
+	}
+	io.println(p.text_of("output"));
+	if p.int_of("jobs", 0) != 8 {
+		return 4;
+	}
+	for i in 0..p.len() {
+		io.println(p.at(i));
+	}
+
+	let out = text.Builder.new();
+	p.help(&out);
+	io.print(out.text());
+
+	let q = args.Parser.new("pin", "");
+	let wrong: [2]str = ["pin", "--missing"];
+	q.parse(wrong[0..2]) catch e {
+		io.println(e.message);
+		return 0;
+	};
+	return 5;
+}

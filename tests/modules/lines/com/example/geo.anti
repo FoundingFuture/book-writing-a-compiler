@@ -1,0 +1,24 @@
+//! Plane geometry.
+//#! Built for the tests.
+/// A point.
+///
+///     Two fields.
+pub struct Point
+{
+	/// Across.
+	x: int,
+	y: int,
+}
+
+/// Dot product.
+//# Not a note in the file.
+pub fn dot(a: Point, b: Point) -> int
+{
+	return a.x * b.x + a.y * b.y;
+}
+
+/// Private, not in the file.
+fn hidden() -> int
+{
+	return 1;
+}

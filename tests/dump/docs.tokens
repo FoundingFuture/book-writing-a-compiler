@@ -1,0 +1,17 @@
+1:1   doc      /// Scale by a factor.
+4:1   keyword  fn
+4:4   ident    scale
+4:9   symbol   (
+4:10  ident    x
+4:11  symbol   :
+4:13  keyword  int
+4:16  symbol   )
+4:18  symbol   ->
+4:21  keyword  int
+5:1   symbol   {
+6:2   keyword  return
+6:9   ident    x
+6:11  symbol   *
+6:13  int_lit  2
+6:14  symbol   ;
+7:1   symbol   }

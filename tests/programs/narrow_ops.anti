@@ -1,0 +1,63 @@
+fn narrow(a: i16, b: i16) -> i16
+{
+	let q = a / b;
+	let r = a % b;
+	if a < b {
+		return q * r;
+	}
+	return (q >> 1) ^ (r << 3);
+}
+
+fn bytes(a: u8, b: i8) -> int
+{
+	return (a * 3) as int + (b + 1) as int;
+}
+
+fn shifts(a: int, n: int) -> int
+{
+	return (a << n) + (a >> n) + ((a as u64 >> n as u64) as int);
+}
+
+fn ushift(a: u32, b: u32) -> u32
+{
+	return (a >> b) / (b << 2);
+}
+
+fn imms(a: int) -> int
+{
+	let m = (a & 0xff00) | 0x5555555555555555;
+	let k = (m ^ 0x1234) + 0x3000;
+	if k < 0x7000 {
+		return k - 0x2000;
+	}
+	return k;
+}
+
+fn cmps(a: u8, b: i16, c: i32) -> int
+{
+	let n = 0;
+	if a + 1 < 10 {
+		n += 1;
+	}
+	if b < -5 {
+		n += 2;
+	}
+	if c > -5 {
+		n += 4;
+	}
+	if b >= -30000 {
+		n += 8;
+	}
+	return n;
+}
+
+fn main() -> int
+{
+	let s = narrow(-300, 7) as int + narrow(1000, -9) as int;
+	s += bytes(200, 127) + bytes(5, -128);
+	s += shifts(-12345, 3) + shifts(99, 60);
+	s += ushift(4000000000, 3) as int;
+	s += imms(0x1234) + imms(-1);
+	s += cmps(255, -6, -4) * 3 + cmps(3, 7, -9);
+	return s % 251;
+}

@@ -1,0 +1,11 @@
+extern fn putchar(c: i32) -> i32;
+
+fn main() -> int
+{
+	let i = 0;
+	while i < 3 do {
+		putchar(65 + i as i32);
+		i += 1;
+	}
+	return i;
+}

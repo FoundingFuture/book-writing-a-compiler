@@ -1,0 +1,32 @@
+//! `self.super` is the base part of the object as a value. A call on it
+//! reaches the base's body directly, so a concrete function can add to
+//! what the function it replaces does.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Base
+{
+	pub n: int = 1,
+
+	pub fn value(self) -> int
+	{
+		return self.n;
+	}
+}
+
+class Derived
+{
+	inherits Base,
+	concrete fn value(self) -> int
+	{
+		return 100 + self.super.value();
+	}
+}
+
+fn main() -> int
+{
+	let d = Derived { n: 2 };
+	let p: *Base = &d;
+	printf("%d %d\n".ptr, d.value() as c_int, p.value() as c_int);
+	return 0;
+}

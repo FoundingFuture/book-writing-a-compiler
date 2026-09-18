@@ -1,0 +1,105 @@
+//! A logger reads its level, its format and its sink from the file that
+//! `ANTI_LOGGER` names, drops what its level drops, and writes a text
+//! line and a JSON line.
+import anti.io;
+import anti.json;
+import anti.log;
+import anti.text;
+
+extern fn setenv(name: *byte, value: *byte, overwrite: c_int) -> c_int;
+extern fn fopen(path: *byte, mode: *byte) -> *byte;
+extern fn fclose(file: *byte) -> c_int;
+extern fn fwrite(bytes: *byte, size: c_size_t, count: c_size_t,
+	file: *byte) -> c_size_t;
+extern fn fgets(into: *byte, size: c_int, file: *byte) -> *byte;
+
+const CONFIG: str = "level = \"warn\"\nformat = \"text\"\n\n[[sink]]\nkind = \"file\"\npath = \"log-test.out\"\n";
+
+/// Print the line without the wall clock that opens it.
+fn seen(line: str)
+{
+	if line.len != 0 && line[0] == 0x7B {
+		let level = "";
+		let name = "";
+		let message = "";
+		json.member(line, "level", &level);
+		json.member(line, "name", &name);
+		json.member(line, "message", &message);
+		let plain = text.Builder.new();
+		json.unquote(level, &plain);
+		plain.append(" ");
+		json.unquote(name, &plain);
+		plain.append(" ");
+		json.unquote(message, &plain);
+		io.println(plain.text());
+		return;
+	}
+	let space = text.find_byte(line, 0x20);
+	io.print(text.slice(line, space + 1, line.len));
+}
+
+fn write_file(path: str, what: str)
+{
+	let file = fopen(path.ptr, "wb".ptr);
+	if file == null {
+		return;
+	}
+	fwrite(what.ptr, 1 as c_size_t, what.len as c_size_t, file);
+	fclose(file);
+}
+
+fn show_file(path: str)
+{
+	let file = fopen(path.ptr, "rb".ptr);
+	if file == null {
+		io.println("no file");
+		return;
+	}
+	let room = alloc(byte, 512);
+	while fgets(room, 512 as c_int, file) != null do {
+		seen(text.from_c(room));
+	}
+	fclose(file);
+	free(room);
+}
+
+fn main() -> int
+{
+	write_file("log-test.toml", CONFIG);
+	write_file("log-test.out", "");
+	setenv("ANTI_LOGGER".ptr, "log-test.toml".ptr, 1 as c_int);
+
+	/* The first call builds the logger the file asks for. */
+	log.info("dropped by the level of the file");
+	log.warn("to the file");
+	log.error("also to the file");
+	show_file("log-test.out");
+
+	let sink = log.CallbackSink.new(seen);
+	let before = log.set(log.Logger.new("test", log.Level.Info, sink));
+	delete(before);
+
+	log.trace("dropped");
+	log.debug("dropped");
+	log.info("one");
+	log.warn("two");
+
+	log.logger().level = log.Level.Error;
+	log.info("dropped");
+	log.error("three");
+
+	log.logger().level = log.Level.Info;
+	log.logger().format = log.Format.Json;
+	log.info("four");
+
+	if log.level_of("warn", log.Level.Info) != log.Level.Warn {
+		return 1;
+	}
+	if !text.equal(log.level_name(log.Level.Fatal), "fatal") {
+		return 2;
+	}
+	if log.level_of("nonsense", log.Level.Debug) != log.Level.Debug {
+		return 3;
+	}
+	return 0;
+}

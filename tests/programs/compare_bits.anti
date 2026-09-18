@@ -1,0 +1,33 @@
+fn cmp(a: i32, b: i32) -> bool
+{
+	return !(a < b) == (a != b);
+}
+
+fn bits(m: i32) -> i32
+{
+	return (m & -2) | (m ^ 65536);
+}
+
+fn arith(x: int, y: int) -> int
+{
+	let big = x + 5000000000;
+	let neg = y - -7;
+	return -big * ~neg;
+}
+
+fn main() -> int
+{
+	if cmp(1, 2) {
+		return 1;
+	}
+	if !cmp(2, 1) {
+		return 2;
+	}
+	if bits(5) != 65541 {
+		return 3;
+	}
+	if arith(1, 2) != 50000000010 {
+		return 4;
+	}
+	return 5;
+}

@@ -1,0 +1,38 @@
+//! Every class inherits the seven public functions of `anti.rt.Object`.
+//! Their bodies live in the runtime and read the descriptor, so
+//! `type_name` gives the class name and `equals` and `hash` walk the
+//! fields of the chain. A class replaces one with a `concrete fn`.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+class Point
+{
+	pub x: int = 1,
+	pub y: int = 2,
+}
+
+class Named
+{
+	inherits Point,
+	concrete fn type_name(self) -> str
+	{
+		return "renamed";
+	}
+}
+
+fn main() -> int
+{
+	let p = Point { };
+	let q = Point { };
+	let r = Point { x: 9 };
+	let n = Named { };
+	let a: *Point = &p;
+	let b: *Point = &n;
+
+	printf("%.*s %.*s\n".ptr, a.type_name().len as c_int,
+		a.type_name().ptr, b.type_name().len as c_int,
+		b.type_name().ptr);
+	printf("%d %d\n".ptr, a.equals(&q) as c_int, a.equals(&r) as c_int);
+	printf("%d\n".ptr, (a.hash() == (&q as *Point).hash()) as c_int);
+	return 0;
+}

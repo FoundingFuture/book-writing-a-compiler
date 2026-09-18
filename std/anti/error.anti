@@ -1,0 +1,123 @@
+//! The error convention of the language.
+//!
+//! A function that can fail returns `*Error`, `null` on success, and writes
+//! its results through out pointers. A function that cannot fail returns
+//! its value. A function whose only failure is "not present" returns
+//! `bool`. The caller owns a returned error and either deletes it or
+//! returns it upward.
+
+import anti.io;
+import anti.text;
+
+extern fn anti_rt_errno() -> c_int;
+extern fn anti_rt_errno_text(code: c_int) -> *byte;
+extern fn anti_rt_last_error() -> c_int;
+extern fn anti_rt_last_error_text(code: c_int) -> *byte;
+
+/// A failure, with a code, a message and the error that caused it.
+pub class Error
+{
+	/// The code of the failure, which the caller may switch on.
+	pub code: int = 0,
+	/// One line, without a trailing newline.
+	pub message: str = "",
+	/// The error below this one, or `null`.
+	own cause: *Error,
+
+	/// An error with a code and a message and no cause.
+	pub fn new(code: int, message: str) -> *Error
+	{
+		return alloc Error { code: code, message: message, cause: null };
+	}
+
+	/// An error that wraps the one below it.
+	pub fn wrap(code: int, message: str, cause: *Error) -> *Error
+	{
+		return alloc Error { code: code, message: message, cause: cause };
+	}
+
+	/// The error of the last failing C call, from `errno`.
+	pub fn from_errno() -> *Error
+	{
+		let code = anti_rt_errno() as int;
+		return Error.new(code, text.from_c(anti_rt_errno_text(code as c_int)));
+	}
+
+	/// The error of the last failing Win32 call.
+	///
+	/// Every other system gives an error with code 0 and an empty
+	/// message, because it has no Win32 to ask.
+	pub fn from_win32() -> *Error
+	{
+		let code = anti_rt_last_error() as int;
+		return Error.new(code, text.from_c(anti_rt_last_error_text(code as c_int)));
+	}
+
+	/// Write this error and every cause below it to standard error.
+	pub fn print(self)
+	{
+		io.eprint(self.message);
+		io.eprint("\n");
+		let below = self.cause;
+		while below != null do {
+			io.eprint("  caused by: ");
+			io.eprint(below.message);
+			io.eprint("\n");
+			below = below.cause;
+		}
+	}
+
+	/// This error and every cause below it, in one text.
+	///
+	/// The builder owns the bytes, so the caller keeps it alive as long
+	/// as it reads the text.
+	pub fn text(self, out: *text.Builder)
+	{
+		out.append(self.message);
+		let below = self.cause;
+		while below != null do {
+			out.append("\n  caused by: ");
+			out.append(below.message);
+			below = below.cause;
+		}
+	}
+
+	/// Print this error and end the program with its code, or with 1.
+	///
+	/// The function that `on_fatal` registered runs first.
+	pub fn fatal(self)
+	{
+		let last = Fatal.get().hook.load();
+		if last != null {
+			last();
+		}
+		self.print();
+		if self.code != 0 {
+			io.exit(self.code);
+		}
+		io.exit(1);
+	}
+}
+
+/// The one function that runs before `fatal` ends the program.
+singleton class Fatal
+{
+	atomic hook: fn() = null,
+}
+
+/// Register the function that runs before `fatal` ends the program.
+///
+/// One function is registered at a time, and a later call replaces the
+/// one before it.
+pub fn on_fatal(f: fn())
+{
+	Fatal.get().hook.store(f);
+}
+
+/// Call `fatal` on a non-null error, and return on a null one.
+pub fn check(e: *Error)
+{
+	if e != null {
+		e.fatal();
+	}
+}

@@ -1,0 +1,7 @@
+fn cell(a: int, b: int) -> int
+{
+	let x = a;
+	let p = &x;
+	*p = *p + b;
+	return x;
+}

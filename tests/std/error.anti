@@ -1,0 +1,67 @@
+//! The error convention: a failing function returns `*Error`, and every
+//! call of one handles the error. `catch` handles it at the call, `try`
+//! hands it to the caller, and a `try` block gives one handler to a
+//! whole block.
+import anti.error;
+import anti.io;
+
+extern fn fopen(path: *byte, mode: *byte) -> *byte;
+
+fn open_missing(path: str) -> *error.Error
+{
+	if fopen(path.ptr, "r".ptr) == null {
+		return error.Error.from_errno();
+	}
+	return null;
+}
+
+fn read_config() -> *error.Error
+{
+	try open_missing("/nonexistent/anti/config.toml");
+	return null;
+}
+
+fn size_of_file(path: str, out: *int) -> *error.Error
+{
+	if fopen(path.ptr, "r".ptr) == null {
+		*out = 0;
+		return error.Error.new(7, "no such file");
+	}
+	*out = 1;
+	return null;
+}
+
+fn main() -> int
+{
+	error.check(null);
+
+	let size = size_of_file("/nonexistent/anti/size") catch e {
+		if e.code != 7 {
+			return 2;
+		}
+		yield 42;
+	};
+	if size != 42 {
+		return 3;
+	}
+
+	read_config() catch e {
+		e.print();
+	};
+
+	try {
+		open_missing("/nonexistent/anti/one");
+		io.println("not reached");
+	} catch e {
+		io.println("block caught");
+	}
+
+	/* Every system but Windows has no Win32 error to give. */
+	let w = error.Error.from_win32();
+	if w.code != 0 {
+		return 4;
+	}
+	delete(w);
+	io.println("done");
+	return 0;
+}

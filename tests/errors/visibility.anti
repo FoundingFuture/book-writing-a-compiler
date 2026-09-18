@@ -1,0 +1,56 @@
+class Shape
+{
+	pub x: f32 = 0.0,
+	protected guard: int = 1,
+
+	protected fn recompute(self)
+	{
+		self.guard = 2;
+	}
+}
+
+class Circle
+{
+	inherits Shape,
+	r: f32 = 1.0,
+
+	pub fn widen(self)
+	{
+		self.recompute();
+		self.guard = self.guard + 1;
+		self.r = self.r + 1.0;
+	}
+}
+
+class Counter
+{
+	pub n: int = 0,
+
+	fn helper(self) -> int
+	{
+		return self.n;
+	}
+
+	pub fn total(self) -> int
+	{
+		return self.helper();
+	}
+}
+
+fn main() -> int
+{
+	let c = Circle { };
+	let k = Counter { };
+	c.widen();
+	if c.r > 0.0 {
+		return 1;
+	}
+	c.recompute();
+	if c.guard != 0 {
+		return 2;
+	}
+	if k.helper() != 0 {
+		return 3;
+	}
+	return k.total() + (c.x as int);
+}

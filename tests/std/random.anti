@@ -1,0 +1,63 @@
+//! One seed gives one sequence, and two generators of one seed agree.
+//! `below` stays inside its limit and `fraction` inside the unit range.
+import anti.io;
+import anti.random;
+
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+fn main() -> int
+{
+	let a = random.Random.new(42);
+	let b = random.Random.new(42);
+	let i = 0;
+	while i < 100 do {
+		if a.next() != b.next() {
+			return 1;
+		}
+		i += 1;
+	}
+
+	let c = random.Random.new(7);
+	let counts = alloc([6]int, 1);
+	i = 0;
+	while i < 6 do {
+		(*counts)[i] = 0;
+		i += 1;
+	}
+	i = 0;
+	while i < 6000 do {
+		let roll = c.below(6) as int;
+		if roll < 0 || roll > 5 {
+			return 2;
+		}
+		(*counts)[roll] = (*counts)[roll] + 1;
+		i += 1;
+	}
+	i = 0;
+	while i < 6 do {
+		/* Six thousand rolls of a fair die land far from an empty face. */
+		if (*counts)[i] < 800 || (*counts)[i] > 1200 {
+			return 3;
+		}
+		i += 1;
+	}
+
+	i = 0;
+	while i < 1000 do {
+		let f = c.fraction();
+		if f < 0.0 || f >= 1.0 {
+			return 4;
+		}
+		let n = c.between(10, 20);
+		if n < 10 || n >= 20 {
+			return 5;
+		}
+		i += 1;
+	}
+
+	let d = random.Random.new(42);
+	printf("%llu\n".ptr, d.next());
+	free(counts);
+	io.println("done");
+	return 0;
+}

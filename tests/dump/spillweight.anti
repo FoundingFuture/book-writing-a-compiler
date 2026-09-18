@@ -1,0 +1,28 @@
+//! A loop counter and a value used once outside the loop. The counter is
+//! read on every pass and the other value once, so the counter keeps its
+//! register and the other one gives it up when registers run out.
+
+extern fn use12(a: int, b: int, c: int, d: int, e: int, f: int, g: int,
+                h: int, i: int, j: int, k: int, l: int) -> int;
+
+pub fn hot(n: int) -> int
+{
+	let a = n + 1;
+	let b = n + 2;
+	let c = n + 3;
+	let d = n + 4;
+	let e = n + 5;
+	let f = n + 6;
+	let g = n + 7;
+	let h = n + 8;
+	let i = n + 9;
+	let j = n + 10;
+	let k = n + 11;
+	let total = 0;
+	let counter = 0;
+	while counter < n do {
+		total += counter;
+		counter += 1;
+	}
+	return total + use12(a, b, c, d, e, f, g, h, i, j, k, counter);
+}

@@ -1,0 +1,51 @@
+x86.div:
+b0:
+    sdiv x9, x0, x1
+    sdiv x10, x0, x1
+    msub x10, x10, x1, x0
+    add x0, x9, x10
+    ret
+x86.ushift:
+b0:
+    lsr w9, w0, w1
+    lsl w10, w1, #2
+    udiv w0, w9, w10
+    ret
+x86.bytes:
+b0:
+    mov w9, #3
+    mul w9, w0, w9
+    uxtb w9, w9
+    add w10, w1, #1
+    sxtb x10, w10
+    add x0, x9, x10
+    ret
+x86.narrow:
+b0:
+    sxth w9, w0
+    sxth w10, w1
+    sdiv w9, w9, w10
+    sxth w10, w0
+    sxth w11, w1
+    sdiv w12, w10, w11
+    msub w10, w12, w11, w10
+    sxth w11, w0
+    cmp w11, w1, sxth
+    b.ge b2
+b1:
+    mul w0, w9, w10
+    ret
+b2:
+    sxth w9, w9
+    asr w9, w9, #1
+    lsl w10, w10, #3
+    eor w0, w9, w10
+    ret
+x86.shifts:
+b0:
+    lsl x9, x0, x1
+    asr x10, x0, x1
+    add x9, x9, x10
+    lsr x10, x0, x1
+    add x0, x9, x10
+    ret

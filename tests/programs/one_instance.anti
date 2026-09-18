@@ -1,0 +1,34 @@
+//! A singleton has one instance, which `get` makes on the first call
+//! and every later call reads. A field is read-only after creation,
+//! `mutable` marks one the program writes, and an atomic field has
+//! its own operations.
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+singleton class Config
+{
+	path: str = "config.toml",
+	atomic requests: int = 0,
+	mutable title: str = "untitled",
+
+	fn construct(self)
+	{
+		self.title = "ready";
+	}
+
+	pub fn where(self) -> str
+	{
+		return self.path;
+	}
+}
+
+fn main() -> int
+{
+	Config.get().requests.add(1);
+	Config.get().requests.add(1);
+	printf("%d\n".ptr, Config.get().requests.load() as c_int);
+	printf("%s\n".ptr, Config.get().title.ptr);
+	printf("%s\n".ptr, Config.get().where().ptr);
+	Config.get().title = "changed";
+	printf("%s\n".ptr, Config.get().title.ptr);
+	return 0;
+}

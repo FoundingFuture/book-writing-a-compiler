@@ -1,0 +1,77 @@
+structs.call:
+b0:
+    pushq %rbp
+    movq %rsp, %rbp
+    subq $192, %rsp
+    movq %rbx, 184(%rsp)
+    movq %r12, 176(%rsp)
+    movq %r13, 168(%rsp)
+    movq %r14, 160(%rsp)
+    movq %r15, 152(%rsp)
+    leaq 24(%rsp), %rbx
+    movq %rdi, (%rbx)
+    movsd %xmm0, 8(%rbx)
+    leaq 16(%rbp), %r10
+    movq %r10, 144(%rsp)
+    leaq 40(%rsp), %r13
+    movw %si, (%r13)
+    shrq $16, %rsi
+    movb %sil, 2(%r13)
+    leaq 48(%rsp), %r14
+    movsd %xmm1, (%r14)
+    leaq 56(%rsp), %r15
+    leaq 80(%rsp), %r10
+    movq %r10, 136(%rsp)
+    movq (%rbx), %rsi
+    leaq 96(%rsp), %r12
+    movq %r12, %rdi
+    call make
+    movq (%r12), %rax
+    movq %rax, (%r15)
+    movq 8(%r12), %rax
+    movq %rax, 8(%r15)
+    movq 16(%r12), %rax
+    movq %rax, 16(%r15)
+    leaq (%rsp), %rax
+    movq (%r15), %rcx
+    movq %rcx, (%rax)
+    movq 8(%r15), %rcx
+    movq %rcx, 8(%rax)
+    movq 16(%r15), %rcx
+    movq %rcx, 16(%rax)
+    movq (%rbx), %rdi
+    movsd 8(%rbx), %xmm0
+    movzwl (%r13), %esi
+    movzbl 2(%r13), %eax
+    shlq $16, %rax
+    orq %rax, %rsi
+    movsd (%r14), %xmm1
+    call take
+    leaq 120(%rsp), %rcx
+    movq %rax, (%rcx)
+    movsd %xmm0, 8(%rcx)
+    movq (%rcx), %rax
+    movq 136(%rsp), %r10
+    movq %rax, (%r10)
+    movq 8(%rcx), %rax
+    movq 136(%rsp), %r10
+    movq %rax, 8(%r10)
+    movq 136(%rsp), %r10
+    movq (%r10), %rax
+    movq 144(%rsp), %r10
+    movq 16(%r10), %rcx
+    addq %rcx, %rax
+    movq 136(%rsp), %r10
+    movq %rax, (%r10)
+    movq 136(%rsp), %r10
+    movq (%r10), %rax
+    movq 136(%rsp), %r10
+    movsd 8(%r10), %xmm0
+    movq 184(%rsp), %rbx
+    movq 176(%rsp), %r12
+    movq 168(%rsp), %r13
+    movq 160(%rsp), %r14
+    movq 152(%rsp), %r15
+    movq %rbp, %rsp
+    popq %rbp
+    ret

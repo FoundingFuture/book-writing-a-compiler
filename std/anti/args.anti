@@ -1,0 +1,320 @@
+//! Command-line options declared once and read by name.
+//!
+//! A program declares its options, parses the arguments of `main` and
+//! asks for each one by its long name. The help text comes from the same
+//! declarations, so it never falls behind them.
+//!
+//! An option has a long name and one letter. A flag stands for itself.
+//! An option that takes a value reads `--name value`, `--name=value` or
+//! `-n value`. A bare `--` ends the options, and every argument after it
+//! is a positional one, as is any argument that does not start with `-`.
+//! `--help` and `-h` are declared for every parser.
+
+import anti.error;
+import anti.text;
+
+extern fn memcpy(to: *byte, from: *byte, count: c_size_t) -> *byte;
+
+/// One declared option, with what the command line gave it.
+struct Option
+{
+	name: str,
+	letter: byte,
+	help: str,
+	takes: bool,
+	given: bool,
+	value: str,
+}
+
+/// The options of one program.
+pub class Parser
+{
+	program: str = "",
+	about: str = "",
+	own options: []Option,
+	count: int = 0,
+	own rest: []str,
+	rest_count: int = 0,
+	said: text.Builder,
+
+	/// A parser for `program`, which `about` describes in one line.
+	pub fn new(program: str, about: str) -> Parser
+	{
+		let p = Parser { program: program, about: about,
+			options: []Option { ptr: null, len: 0 }, count: 0,
+			rest: []str { ptr: null, len: 0 }, rest_count: 0,
+			said: text.Builder.new() };
+		p.flag("help", 0x68, "write this text and stop");
+		return p;
+	}
+
+	/// Declare an option that stands for itself.
+	///
+	/// `letter` is the byte of its one-letter form, or 0 for none.
+	pub fn flag(self, name: str, letter: byte, help: str)
+	{
+		self.declare(name, letter, help, false, "");
+	}
+
+	/// Declare an option that takes a value.
+	///
+	/// `fallback` is the value of the option when the command line
+	/// leaves it out.
+	pub fn value(self, name: str, letter: byte, help: str, fallback: str)
+	{
+		self.declare(name, letter, help, true, fallback);
+	}
+
+	/// Read `argv` as the command line, from its second entry on.
+	///
+	/// An unknown option gives an error with code 1, and an option that
+	/// takes a value and has none gives code 2.
+	pub fn parse(self, argv: []str) -> *error.Error
+	{
+		let only_rest = false;
+		let i = 1;
+		while i < argv.len do {
+			let arg = argv[i];
+			if only_rest || !self.is_option(arg) {
+				self.keep(arg);
+				i += 1;
+				continue;
+			}
+			if text.equal(arg, "--") {
+				only_rest = true;
+				i += 1;
+				continue;
+			}
+			let taken = try self.read_option(arg, argv, i);
+			i = i + taken;
+		}
+		return null;
+	}
+
+	/// Whether the command line gave the option called `name`.
+	pub fn given(self, name: str) -> bool
+	{
+		let at = self.index_of(name);
+		return at >= 0 && self.options[at].given;
+	}
+
+	/// The value of the option called `name`, or its fallback.
+	pub fn text_of(self, name: str) -> str
+	{
+		let at = self.index_of(name);
+		if at < 0 {
+			return "";
+		}
+		return self.options[at].value;
+	}
+
+	/// The value of the option called `name` as an integer.
+	///
+	/// A value that spells no integer gives `fallback`.
+	pub fn int_of(self, name: str, fallback: int) -> int
+	{
+		return text.to_int(self.text_of(name), fallback);
+	}
+
+	/// The number of arguments that are no option.
+	pub fn len(self) -> int
+	{
+		return self.rest_count;
+	}
+
+	/// The argument at `index` of those that are no option.
+	pub fn at(self, index: int) -> str
+	{
+		if index < 0 || index >= self.rest_count {
+			return "";
+		}
+		return self.rest[index];
+	}
+
+	/// Write the help text of every declared option into `out`.
+	pub fn help(self, out: *text.Builder)
+	{
+		out.append("usage: ");
+		out.append(self.program);
+		out.append(" [options]\n");
+		if self.about.len != 0 {
+			out.append(self.about);
+			out.append("\n");
+		}
+		out.append("\n");
+		let width = 0;
+		for i in 0..self.count {
+			let room = self.options[i].name.len;
+			if self.options[i].takes {
+				room = room + 8;
+			}
+			if room > width {
+				width = room;
+			}
+		}
+		for i in 0..self.count {
+			out.append("  ");
+			if self.options[i].letter != 0 {
+				out.append("-");
+				out.append_byte(self.options[i].letter);
+				out.append(", ");
+			} else {
+				out.append("    ");
+			}
+			out.append("--");
+			out.append(self.options[i].name);
+			let room = self.options[i].name.len;
+			if self.options[i].takes {
+				out.append(" <value>");
+				room = room + 8;
+			}
+			for 0..width - room + 2 {
+				out.append_byte(0x20);
+			}
+			out.append(self.options[i].help);
+			out.append("\n");
+		}
+	}
+
+	/// The message `head` and `tail` spell, kept by the parser.
+	///
+	/// An error of `parse` points its message here, so the parser lives
+	/// as long as the error the program reads.
+	fn say(self, head: str, tail: str) -> str
+	{
+		self.said.clear();
+		self.said.append(head);
+		self.said.append(tail);
+		return self.said.text();
+	}
+
+	/// Whether `arg` is an option rather than a positional argument.
+	fn is_option(self, arg: str) -> bool
+	{
+		/* 0x2D is the byte of `-`, and `-` alone is an argument that
+		   names standard input by convention. */
+		return arg.len > 1 && arg[0] == 0x2D;
+	}
+
+	/// The index of the option called `name`, or -1.
+	fn index_of(self, name: str) -> int
+	{
+		for i in 0..self.count {
+			if text.equal(self.options[i].name, name) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/// The index of the option whose letter is `letter`, or -1.
+	fn index_of_letter(self, letter: byte) -> int
+	{
+		for i in 0..self.count {
+			if self.options[i].letter == letter {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	/// Read the option at `i` of `argv` and say how many entries it took.
+	fn read_option(self, arg: str, argv: []str, i: int,
+		taken: *int) -> *error.Error
+	{
+		let body = text.slice(arg, 1, arg.len);
+		let long = false;
+		if body[0] == 0x2D {
+			body = text.slice(body, 1, body.len);
+			long = true;
+		}
+		let value = "";
+		let has_value = false;
+		let cut = text.find_byte(body, 0x3D);
+		if cut >= 0 {
+			value = text.slice(body, cut + 1, body.len);
+			body = text.slice(body, 0, cut);
+			has_value = true;
+		}
+		let at = -1;
+		if long {
+			at = self.index_of(body);
+		} else if body.len == 1 {
+			at = self.index_of_letter(body[0]);
+		}
+		if at < 0 {
+			return error.Error.new(1, self.say("unknown option: ", arg));
+		}
+		*taken = 1;
+		if !self.options[at].takes {
+			self.options[at].given = true;
+			return null;
+		}
+		if !has_value {
+			if i + 1 >= argv.len {
+				return error.Error.new(2,
+					self.say("the option has no value: ", arg));
+			}
+			value = argv[i + 1];
+			*taken = 2;
+		}
+		self.options[at].given = true;
+		self.options[at].value = value;
+		return null;
+	}
+
+	/// Add one option to the declarations.
+	fn declare(self, name: str, letter: byte, help: str, takes: bool,
+		fallback: str)
+	{
+		self.reserve(self.count + 1);
+		self.options[self.count] = Option { name: name, letter: letter,
+			help: help, takes: takes, given: false, value: fallback };
+		self.count = self.count + 1;
+	}
+
+	/// Add one argument that is no option.
+	fn keep(self, arg: str)
+	{
+		if self.rest_count + 1 > self.rest.len {
+			let size = self.rest.len;
+			if size == 0 {
+				size = 8;
+			}
+			while size < self.rest_count + 1 do {
+				size = size * 2;
+			}
+			let room = alloc(str, size);
+			if self.rest.ptr != null {
+				memcpy(room as *byte, self.rest.ptr as *byte,
+					(self.rest_count * size_of(str)) as c_size_t);
+				free(self.rest.ptr);
+			}
+			self.rest = []str { ptr: room, len: size };
+		}
+		self.rest[self.rest_count] = arg;
+		self.rest_count = self.rest_count + 1;
+	}
+
+	/// Make room for `wanted` options.
+	fn reserve(self, wanted: int)
+	{
+		if wanted <= self.options.len {
+			return;
+		}
+		let size = self.options.len;
+		if size == 0 {
+			size = 8;
+		}
+		while size < wanted do {
+			size = size * 2;
+		}
+		let room = alloc(Option, size);
+		if self.options.ptr != null {
+			memcpy(room as *byte, self.options.ptr as *byte,
+				(self.count * size_of(Option)) as c_size_t);
+			free(self.options.ptr);
+		}
+		self.options = []Option { ptr: room, len: size };
+	}
+}

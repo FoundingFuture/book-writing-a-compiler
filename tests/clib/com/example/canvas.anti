@@ -1,0 +1,48 @@
+//! Shapes a C program can build, measure and end. The class carries its
+//! table pointer first, so C reads the layout as nested structs and calls
+//! the entry through the table.
+
+/// What a shape can be drawn with.
+export abstract class Ink
+{
+	/// The colour the shape draws with.
+	abstract fn colour(self) -> c_int;
+}
+
+/// A shape on the canvas.
+export class Shape
+{
+	x: c_int = 0,
+	y: c_int = 0,
+
+	/// The area of the shape, which each class below decides.
+	export fn area(self) -> c_int
+	{
+		return 0;
+	}
+
+	/// Move the shape by dx and dy.
+	export fn move(self, dx: c_int, dy: c_int)
+	{
+		self.x = self.x + dx;
+		self.y = self.y + dy;
+	}
+}
+
+/// A square of one side.
+export class Square
+{
+	inherits Shape,
+	implements ink: Ink,
+	side: c_int = 1,
+
+	concrete fn area(self) -> c_int
+	{
+		return self.side * self.side;
+	}
+
+	concrete fn colour(self) -> c_int
+	{
+		return 7;
+	}
+}

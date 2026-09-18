@@ -1,0 +1,95 @@
+//! A class implements two interfaces. Each sub-object carries its own
+//! table, whose entries are thunks into the class's own functions, so a
+//! call through an interface pointer and a direct call reach one body.
+import anti.io;
+
+extern fn printf(fmt: *byte, ...) -> c_int;
+
+abstract class Drawable
+{
+	abstract fn draw(self);
+}
+
+abstract class Readable
+{
+	abstract fn read(self) -> int;
+}
+
+abstract class Sizeable
+{
+	abstract fn size(self) -> int;
+
+	pub fn twice(self) -> int
+	{
+		return self.size() * 2;
+	}
+}
+
+class Square
+{
+	implements dr: Drawable,
+	implements sz: Sizeable,
+	implements rd: Readable,
+
+	pub side: int = 2,
+
+	concrete fn draw(self)
+	{
+		printf("square %d\n".ptr, self.side as c_int);
+	}
+
+	concrete fn size(self) -> int
+	{
+		return self.side * self.side;
+	}
+
+	/* A qualified body fills the table of that interface alone. */
+	concrete fn Readable::read(self) -> int
+	{
+		return self.side + 100;
+	}
+}
+
+class Dot
+{
+	implements dr: Drawable,
+
+	concrete fn draw(self)
+	{
+		printf("dot\n".ptr);
+	}
+}
+
+fn paint(d: *Drawable)
+{
+	d.draw();
+}
+
+fn main() -> int
+{
+	let s = Square { side: 3 };
+	let d = Dot { };
+	paint(&s);
+	paint(&d);
+	let one: *Drawable = &s;
+	one.draw();
+	let size: *Sizeable = &s;
+	printf("size %d\n".ptr, size.size() as c_int);
+	printf("twice %d\n".ptr, size.twice() as c_int);
+	printf("direct %d\n".ptr, s.size() as c_int);
+	/* An interface pointer leads back to the object it points into. */
+	if one is *Square {
+		let back = one as *Square;
+		printf("back %d\n".ptr, back.side as c_int);
+	}
+	if one == size {
+		printf("same\n".ptr);
+	}
+	let rd: *Readable = &s;
+	printf("read %d\n".ptr, rd.read() as c_int);
+	let other: *Drawable = &d;
+	if one != other {
+		printf("other\n".ptr);
+	}
+	return 0;
+}

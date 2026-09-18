@@ -1,0 +1,53 @@
+extern fn printf(format: *byte, ...) -> i32;
+
+struct Decoded
+{
+	c: char,
+	size: int,
+}
+
+// The bits of continuation byte i of s.
+fn low6(s: str, i: int) -> u32
+{
+	return s[i] as u32 & 63;
+}
+
+// The scalar value that starts at byte i of s. A str holds valid UTF-8,
+// so the first byte gives the length of the sequence.
+fn decode(s: str, i: int) -> Decoded
+{
+	let b = s[i] as u32;
+	if b < 128 {
+		return Decoded { c: b as char, size: 1 };
+	}
+	if b < 224 {
+		return Decoded { c: ((b & 31) << 6 | low6(s, i + 1)) as char, size: 2 };
+	}
+	if b < 240 {
+		let v = (b & 15) << 12 | low6(s, i + 1) << 6 | low6(s, i + 2);
+		return Decoded { c: v as char, size: 3 };
+	}
+	let v = (b & 7) << 18 | low6(s, i + 1) << 12 | low6(s, i + 2) << 6 |
+		low6(s, i + 3);
+	return Decoded { c: v as char, size: 4 };
+}
+
+fn main() -> int
+{
+	let s = "añ€😀";
+	let escaped = "a\u{F1}\u{20AC}\u{1F600}";
+	printf("%d bytes, equal lengths %d\n".ptr, s.len as i32,
+		(s.len == escaped.len) as i32);
+	let count = 0;
+	let i = 0;
+	while i < s.len do {
+		let d = decode(s, i);
+		printf("U+%04X in %d bytes\n".ptr, d.c as u32, d.size as i32);
+		if d.c == '€' {
+			printf("euro at byte %d\n".ptr, i as i32);
+		}
+		i += d.size;
+		count += 1;
+	}
+	return count;
+}

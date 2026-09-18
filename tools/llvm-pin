@@ -1,0 +1,17 @@
+# The archive of LLVM tools for each host, with the SHA-256 digest of the
+# file that tools/pack-llvm.cmake wrote. The version stands in
+# tools/llvm-version alone, and @VERSION@ below takes it. The hosts are
+# named as the targets of antic are. Every host has an archive, and the
+# two Linux ones and macOS on x86_64 are built from source.
+macos-arm64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-macos-arm64.tar.xz
+macos-arm64-digest=fd50e58df5bb452de89da50df706da0893dc9d2f7ade083029e2904ef7bdefa2
+windows-x86_64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-windows-x86_64.tar.xz
+windows-x86_64-digest=962909faeb66075df4c522c16f8a307575ec53ff75d766f3fc1d8996642472f8
+windows-arm64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-windows-arm64.tar.xz
+windows-arm64-digest=6d867f2161d516b887abb61649c332396e4c8e3fc466f01b54d99796e0d2fd93
+linux-x86_64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-linux-x86_64.tar.xz
+linux-x86_64-digest=16f396e5661311dafd391f6662201ddc79f98704496826bb9a8d3838a486af87
+linux-arm64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-linux-arm64.tar.xz
+linux-arm64-digest=50f12601513dcef51e217aa1222b12fa3d79cde3f5043ffd73e2d4a3c739df98
+macos-x86_64-url=https://anti-lang.com/downloads/resources/llvm/@VERSION@/anti-llvm-@VERSION@-macos-x86_64.tar.xz
+macos-x86_64-digest=a2ab18005c6286906a3362ddc7d622c8ba3502eae3c3b44b49575451b65f4c5b

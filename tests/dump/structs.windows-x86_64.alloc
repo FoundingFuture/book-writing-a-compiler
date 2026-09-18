@@ -1,0 +1,87 @@
+structs.call:
+b0:
+    pushq %rbp
+    .seh_pushreg %rbp
+    movq %rsp, %rbp
+    subq $256, %rsp
+    .seh_stackalloc 256
+    movq %rbx, 248(%rsp)
+    .seh_savereg %rbx, 248
+    movq %rsi, 240(%rsp)
+    .seh_savereg %rsi, 240
+    movq %rdi, 232(%rsp)
+    .seh_savereg %rdi, 232
+    movq %r12, 224(%rsp)
+    .seh_savereg %r12, 224
+    movq %r13, 216(%rsp)
+    .seh_savereg %r13, 216
+    movq %r14, 208(%rsp)
+    .seh_savereg %r14, 208
+    movq %r15, 200(%rsp)
+    .seh_savereg %r15, 200
+    .seh_endprologue
+    movq %rcx, %rbx
+    movq %rdx, %rsi
+    movq %r8, %r10
+    movq %r10, 184(%rsp)
+    movq %r9, %r12
+    leaq 48(%rbp), %r13
+    leaq 40(%rsp), %r14
+    leaq 64(%rsp), %r15
+    movq (%rsi), %rdx
+    leaq 80(%rsp), %rdi
+    movq %rdi, %rcx
+    call make
+    movq (%rdi), %rax
+    movq %rax, (%r14)
+    movq 8(%rdi), %rax
+    movq %rax, 8(%r14)
+    movq 16(%rdi), %rax
+    movq %rax, 16(%r14)
+    leaq 104(%rsp), %rdi
+    leaq 128(%rsp), %rdx
+    movq (%rsi), %rax
+    movq %rax, (%rdx)
+    movq 8(%rsi), %rax
+    movq %rax, 8(%rdx)
+    leaq 144(%rsp), %r8
+    movq (%r14), %rax
+    movq %rax, (%r8)
+    movq 8(%r14), %rax
+    movq %rax, 8(%r8)
+    movq 16(%r14), %rax
+    movq %rax, 16(%r8)
+    leaq 176(%rsp), %r9
+    movw (%r12), %ax
+    movw %ax, (%r9)
+    movb 2(%r12), %al
+    movb %al, 2(%r9)
+    leaq 32(%rsp), %rax
+    movq (%r13), %rcx
+    movq %rcx, (%rax)
+    movq %rdi, %rcx
+    call take
+    movq (%rdi), %rax
+    movq %rax, (%r15)
+    movq 8(%rdi), %rax
+    movq %rax, 8(%r15)
+    movq (%r15), %rax
+    movq 184(%rsp), %r10
+    movq 16(%r10), %rcx
+    addq %rcx, %rax
+    movq %rax, (%r15)
+    movq (%r15), %rax
+    movq %rax, (%rbx)
+    movq 8(%r15), %rax
+    movq %rax, 8(%rbx)
+    movq %rbx, %rax
+    movq 248(%rsp), %rbx
+    movq 240(%rsp), %rsi
+    movq 232(%rsp), %rdi
+    movq 224(%rsp), %r12
+    movq 216(%rsp), %r13
+    movq 208(%rsp), %r14
+    movq 200(%rsp), %r15
+    addq $256, %rsp
+    popq %rbp
+    ret

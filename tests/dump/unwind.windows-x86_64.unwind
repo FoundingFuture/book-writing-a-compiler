@@ -1,0 +1,48 @@
+Format: COFF-x86-64
+Arch: x86_64
+AddressSize: 64bit
+UnwindInformation [
+  RuntimeFunction {
+    StartAddress: _A6unwind_spin (0x0)
+    EndAddress: _A6unwind_spin +0x171 (0x4)
+    UnwindInfoAddress: .xdata (0x8)
+    UnwindInfo {
+      Version: 1
+      Flags [ (0x0)
+      ]
+      PrologSize: 73
+      FrameRegister: -
+      FrameOffset: -
+      UnwindCodeCount: 17
+      UnwindCodes [
+        0x49: SAVE_XMM128 reg=XMM6, offset=0x13B0
+        0x41: SAVE_NONVOL reg=R14, offset=0x13C0
+        0x39: SAVE_NONVOL reg=R13, offset=0x13C8
+        0x31: SAVE_NONVOL reg=R12, offset=0x13D0
+        0x29: SAVE_NONVOL reg=RDI, offset=0x13D8
+        0x21: SAVE_NONVOL reg=RSI, offset=0x13E0
+        0x19: SAVE_NONVOL reg=RBX, offset=0x13E8
+        0x11: ALLOC_LARGE size=5104
+        0x01: PUSH_NONVOL reg=RBP
+      ]
+    }
+  }
+  RuntimeFunction {
+    StartAddress: _A4anti2rt_main (0xC)
+    EndAddress: _A6unwind_main +0x28 (0x10)
+    UnwindInfoAddress: .xdata +0x28 (0x14)
+    UnwindInfo {
+      Version: 1
+      Flags [ (0x0)
+      ]
+      PrologSize: 8
+      FrameRegister: -
+      FrameOffset: -
+      UnwindCodeCount: 2
+      UnwindCodes [
+        0x08: ALLOC_SMALL size=32
+        0x01: PUSH_NONVOL reg=RBP
+      ]
+    }
+  }
+]

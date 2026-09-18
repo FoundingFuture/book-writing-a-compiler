@@ -1,0 +1,37 @@
+//! The operating system around the program.
+//!
+//! `on_signal` registers the function that runs when a signal arrives,
+//! and `signal_pending` reads the signal that arrived since the last
+//! call. A handler of the operating system runs on a stack the program
+//! knows nothing about, so the runtime writes the signal into a pipe and
+//! a thread of its own calls the function.
+
+extern fn anti_rt_on_signal(sig: int, f: fn(int));
+extern fn anti_rt_signal_pending() -> int;
+
+/// The interrupt a console sends, which is `Ctrl-C`.
+pub const INTERRUPT: int = 2;
+
+/// The break a console sends.
+pub const BREAK: int = 21;
+
+/// The termination request of the system.
+pub const TERMINATE: int = 15;
+
+/// Register the function that runs when `sig` arrives.
+///
+/// One function per signal, and a later call replaces the one before it.
+/// The function runs on a thread of the runtime, not inside the
+/// handler, so it may do anything an ordinary function does.
+pub fn on_signal(sig: int, f: fn(int))
+{
+	anti_rt_on_signal(sig, f);
+}
+
+/// The signal that arrived since the last call, or 0.
+///
+/// The call clears it, so a loop reads each signal once.
+pub fn signal_pending() -> int
+{
+	return anti_rt_signal_pending();
+}

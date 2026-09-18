@@ -1,0 +1,28 @@
+import anti.io;
+import anti.time;
+
+fn main() -> int
+{
+	if time.as_milliseconds(time.seconds(2)) != 2000 {
+		return 1;
+	}
+	if time.as_seconds(time.milliseconds(2500)) != 2 {
+		return 2;
+	}
+	let sum = time.add(time.seconds(1), time.microseconds(500));
+	if sum.nanoseconds != 1000500000 {
+		return 3;
+	}
+
+	let start = time.now();
+	time.sleep(time.milliseconds(20));
+	let waited = time.between(time.now(), start);
+	if time.as_milliseconds(waited) < 15 {
+		return 4;
+	}
+	if time.wall() <= 0 {
+		return 5;
+	}
+	io.println("ok");
+	return 0;
+}

@@ -1,0 +1,19 @@
+loop.g:
+b0:
+    movq %rdi, %t0
+    movq $0, %t1
+b1:
+    cmpq %t0, %t1
+    jge b3
+b2:
+    addq $1, %t1
+    jmp b1
+b3:
+    cmpq $3, %t1
+    jle b5
+b4:
+    movq $1, %rax
+    ret
+b5:
+    movq $0, %rax
+    ret

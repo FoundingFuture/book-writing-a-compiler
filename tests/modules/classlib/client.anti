@@ -1,0 +1,15 @@
+import com.example.shapes;
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+fn main() -> int
+{
+	let s = shapes.make(5);
+	let b = shapes.Big { size: 2, kind: shapes.Kind.Square };
+	let p: *shapes.Shape = &b;
+
+	printf("%d %d %d\n".ptr, s.size as c_int, s.kind as c_int,
+		s.area() as c_int);
+	printf("%d %d\n".ptr, p.area() as c_int, (p is *shapes.Big) as c_int);
+	return 0;
+}

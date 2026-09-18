@@ -1,0 +1,33 @@
+//! `switch` runs one arm and never falls through. An arm is a block or a
+//! single call or assignment, and `else` takes the rest. A switch on an
+//! enum without `else` covers every value.
+
+extern fn printf(format: *byte, ...) -> c_int;
+
+enum Kind: u8 { Circle, Square, Line }
+
+fn sides(k: Kind) -> int
+{
+	switch k {
+		Kind.Circle => { return 0; },
+		Kind.Square => { return 4; },
+		Kind.Line => { return 2; }
+	}
+	return -1;
+}
+
+fn main() -> int
+{
+	let total = 0;
+	for n in 0..5 {
+		switch n {
+			0 => total += 10,
+			1 => { total += 100; },
+			else => total += 1
+		}
+	}
+	printf("%d %d %d %d\n".ptr, sides(Kind.Circle) as c_int,
+		sides(Kind.Square) as c_int, sides(Kind.Line) as c_int,
+		total as c_int);
+	return 0;
+}

@@ -1,0 +1,11 @@
+exit 0
+square 3
+dot
+square 3
+size 9
+twice 18
+direct 9
+back 3
+same
+read 103
+other

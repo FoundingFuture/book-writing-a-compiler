@@ -1,0 +1,5 @@
+# The pinned raylib release that tools/get-raylib.cmake downloads. GitHub
+# publishes no digest for a source archive, so the digest below is the one
+# of the archive that antic was first tested with.
+RAYLIB_VERSION=6.0
+RAYLIB_DIGEST=2b3ee1e2120c7a0796b33062c7e9a694dd8a8caa56a96319ac8c8ecf54a90d0b
