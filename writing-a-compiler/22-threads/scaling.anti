@@ -1,0 +1,37 @@
+worker fn churn(chunk: []int) -> int
+{
+	let sum = 0;
+	let i = 0;
+	while i < chunk.len do {
+		let x = chunk[i];
+		let k = 0;
+		while k < 4000000 do {
+			x = (x * 1103515 + 12345) % 2147483647;
+			k = k + 1;
+		}
+		sum = sum + x;
+		i = i + 1;
+	}
+	return sum;
+}
+
+fn main() -> int
+{
+	let numbers = [0; 64];
+	let i = 0;
+	while i < 64 do {
+		numbers[i] = i + 1;
+		i = i + 1;
+	}
+	let parts = parallel numbers[0..64] -> churn;
+	let sum = 0;
+	let j = 0;
+	while j < parts.len do {
+		sum = sum + parts[j];
+		j = j + 1;
+	}
+	if sum < 0 {
+		sum = 0 - sum;
+	}
+	return sum % 251;
+}
